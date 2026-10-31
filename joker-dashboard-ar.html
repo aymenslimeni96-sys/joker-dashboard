@@ -12,38 +12,48 @@
         :root { --bg-dark: #0f172a; --bg-card: #1e293b; --primary: #00bfff; --success: #10b981; --danger: #ef4444; --text: #f8fafc; }
         body { background-color: var(--bg-dark); color: var(--text); min-height: 100vh; }
         .sidebar-item { transition: all 0.3s ease; border-right: 3px solid transparent; cursor: pointer; }
-        .sidebar-item:hover, .sidebar-item.active { background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent); border-right-color: var(--primary); }
+        .sidebar-item:hover, .sidebar-item.active { background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent); border-right-color: var(--primary); color: var(--primary) !important; }
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background-color: var(--bg-card); border-radius: 12px; border: 1px solid rgba(0,191,255,0.1); }
-        .btn-primary { background: linear-gradient(135deg, #00bfff, #0080ff); transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #00bfff, #0080ff); transition: all 0.3s ease; border: none; cursor: pointer; border-radius: 8px; font-weight: 600; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,191,255,0.3); }
-        .btn-success { background: linear-gradient(135deg, #10b981, #059669); transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); transition: all 0.3s ease; border: none; cursor: pointer; border-radius: 8px; font-weight: 600; }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(16,185,129,0.3); }
-        .input-field { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 8px; }
+        .input-field { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 8px; padding: 10px 14px; width: 100%; }
         .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,191,255,0.2); }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; z-index: 9999; display: none; }
-        .toast.show { display: block; animation: fadeIn 0.3s ease; }
-        .link-box { background: rgba(0,191,255,0.08); border: 1px dashed #00bfff; border-radius: 8px; padding: 1rem; word-break: break-all; font-size: 0.85rem; color: #93c5fd; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 14px 28px; border-radius: 10px; z-index: 9999; opacity: 0; transition: all 0.4s ease; box-shadow: 0 4px 20px rgba(16,185,129,0.3); font-weight: 600; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .link-box { background: rgba(0,191,255,0.08); border: 1px dashed #00bfff; border-radius: 8px; padding: 14px; word-break: break-all; font-size: 0.85rem; color: #93c5fd; }
+        .toggle-switch { position: relative; width: 48px; height: 26px; background: #374151; border-radius: 13px; cursor: pointer; transition: all 0.3s ease; }
+        .toggle-switch.on { background: #10b981; }
+        .toggle-switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s ease; }
+        .toggle-switch.on::after { right: 25px; }
+        .status-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .stat-card { background: linear-gradient(135deg, rgba(0,191,255,0.1), rgba(168,85,247,0.05)); border: 1px solid rgba(0,191,255,0.2); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 13px; color: #94a3b8; margin-top: 4px; }
     </style>
 </head>
 <body class="flex">
-    <!-- رسالة نجاح -->
-    <div id="toast" class="toast">✅ تم الحفظ بنجاح!</div>
+    <!-- رسالة الحفظ -->
+    <div id="toast" class="toast">✅ تم حفظ الإعدادات بنجاح!</div>
 
     <!-- الشريط الجانبي -->
     <aside class="w-64 min-h-screen bg-slate-900/50 border-l border-cyan-500/10 p-4 fixed right-0 top-0 bottom-0 z-10">
         <div class="text-center mb-8 pt-4">
             <h1 class="text-2xl font-bold text-cyan-400">🃏 JOKER</h1>
             <p class="text-sm text-gray-400 mt-1">لوحة تحكم البوت</p>
-            <div class="mt-3 inline-flex items-center gap-2 text-green-400 text-sm">
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                جاهز
+            <div class="mt-3 status-indicator text-green-400 justify-center">
+                <span class="status-dot"></span>
+                جاهز للعمل
             </div>
         </div>
         <nav class="space-y-2">
-            <div class="sidebar-item active block py-3 px-4 rounded-l-lg" onclick="showPage('home')">
+            <div class="sidebar-item active block py-3 px-4 rounded-l-lg text-gray-300" onclick="showPage('home')">
                 <i class="fa fa-home ml-2"></i> الرئيسية
             </div>
             <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('invite')">
@@ -61,63 +71,90 @@
             <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('points')">
                 <i class="fa fa-star ml-2"></i> النقاط والمتجر
             </div>
+            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('export')">
+                <i class="fa fa-download ml-2"></i> تصدير الإعدادات
+            </div>
         </nav>
     </aside>
 
     <!-- المحتوى الرئيسي -->
     <main class="mr-64 flex-1 p-6">
-        <!-- الرئيسية -->
+        <!-- الصفحة الرئيسية -->
         <div id="home" class="page active">
-            <h2 class="text-2xl font-bold mb-6">مرحباً بك 🃏</h2>
-            <p class="text-gray-400 mb-8">تحكم بجميع إعدادات بوت JOKER الخاص بك بسهولة وأمان</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-4">معلومات البوت</h3>
-                    <p class="text-gray-400">اسم البوت: <span class="text-white font-bold">JOKER</span></p>
-                    <p class="text-gray-400">المعرف: <span class="text-cyan-400 font-bold">1565393363828744302</span></p>
+            <h2 class="text-2xl font-bold mb-6">مرحباً بك في لوحة تحكم JOKER 🃏</h2>
+            <p class="text-gray-400 mb-8">تحكم بجميع إعدادات بوتك بسهولة وأمان. كل تغييراتك محفوظة تلقائياً ✅</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-members">--</div>
+                    <div class="stat-label">أعضاء السيرفر</div>
                 </div>
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-4">إحصائيات</h3>
-                    <p class="text-gray-400">الدعوات: <span id="inviteCount" class="text-white font-bold">0</span></p>
-                    <p class="text-gray-400">النقاط: <span id="totalPoints" class="text-white font-bold">0</span></p>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-invites">0</div>
+                    <div class="stat-label">الدعوات الناجحة</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-points">0</div>
+                    <div class="stat-label">نقاط موزعة</div>
+                </div>
+            </div>
+
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4">ℹ️ معلومات البوت</h3>
+                <div class="space-y-2 text-gray-300">
+                    <p><strong>اسم البوت:</strong> JOKER 🃏</p>
+                    <p><strong>معرف العميل:</strong> <span class="text-cyan-400">1565393363828744302</span></p>
+                    <p><strong>حالة الاتصال:</strong> <span class="text-green-400">جاهز للإضافة</span></p>
+                </div>
+            </div>
+
+            <div class="card p-6 bg-slate-800/50 border-l-4 border-cyan-500">
+                <h4 class="font-semibold text-cyan-300 mb-2">💡 الخطوات الكاملة للتشغيل:</h4>
+                <ol class="text-sm text-gray-300 space-y-1 list-decimal list-inside">
+                    <li>اذهب لصفحة <strong>رابط الدعوة</strong> وأضف البوت لسيرفرك</li>
+                    <li>أكمل إعدادات كل صفحة واضغط <strong>حفظ</strong></li>
+                    <li>اذهب لصفحة <strong>تصدير الإعدادات</strong> واحفظ ملف الإعدادات</li>
+                    <li>ضع الملف مع ملفات البوت وسوف يقرأها البوت تلقائياً عند التشغيل</li>
+                </ol>
             </div>
         </div>
 
         <!-- رابط الدعوة -->
         <div id="invite" class="page">
-            <h2 class="text-2xl font-bold mb-6">رابط الدعوة 🚀</h2>
+            <h2 class="text-2xl font-bold mb-6">رابط دعوة البوت 🚀</h2>
             <div class="card p-6 space-y-4">
-                <p class="text-gray-400">انسخ الرابط وأرسله لأصدقائك:</p>
+                <p class="text-gray-400">انسخ الرابط أدناه وأرسله لأصدقائك ليدخلوا سيرفرك:</p>
+                
                 <div class="link-box flex items-center justify-between gap-3">
-                    <code id="inviteLink" class="text-cyan-300 text-sm">https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8</code>
-                    <button onclick="copyInviteLink()" class="btn-primary px-3 py-2 rounded-lg text-sm">
+                    <code id="inviteLink" class="text-cyan-300 text-sm break-all">https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8</code>
+                    <button onclick="copyText('inviteLink')" class="btn-primary px-3 py-2 text-sm">
                         <i class="fa fa-copy"></i>
                     </button>
                 </div>
-                <a href="https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8" target="_blank" class="btn-success w-full py-3 rounded-lg font-semibold text-center block">
-                    <i class="fa fa-plus-circle ml-2"></i> أضف البوت لسيرفرك
+
+                <a href="https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8" target="_blank" class="btn-success w-full py-3 text-center block">
+                    <i class="fa fa-plus-circle ml-2"></i> افتح صفحة الإضافة
                 </a>
             </div>
         </div>
 
         <!-- الترحيب -->
         <div id="welcome" class="page">
-            <h2 class="text-2xl font-bold mb-6">رسالة الترحيب 👋</h2>
+            <h2 class="text-2xl font-bold mb-6">إعداد رسالة الترحيب 👋</h2>
             <div class="card p-6 space-y-4">
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <span>تفعيل رسالة الترحيب</span>
+                    <div id="welcome-enabled" class="toggle-switch on" onclick="toggleSwitch(this)"></div>
+                </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">نص رسالة الترحيب:</label>
-                    <textarea id="welcomeMsg" class="input-field w-full px-4 py-3 h-32">أهلاً بك في السيرفر الجديد! 🎉 نتمنى لك وقتاً ممتعاً معنا.</textarea>
+                    <textarea id="welcome-message" class="input-field h-32">أهلاً بك في سيرفر JOKER! 🎉 نتمنى لك وقتاً ممتعاً معنا. شارك أصدقائك واحصل على نقاط إضافية! ⭐</textarea>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-2">رابط صورة الترحيب (اختياري):</label>
-                    <input type="text" id="welcomeImg" class="input-field w-full px-4 py-3" placeholder="ألصق رابط الصورة هنا...">
+                    <label class="block text-sm text-gray-400 mb-2">رابط صورة الترحيب:</label>
+                    <input type="text" id="welcome-image" class="input-field" placeholder="ألصق رابط الصورة هنا...">
                 </div>
-                <div class="flex items-center gap-3">
-                    <input type="checkbox" id="welcomeOn" class="w-5 h-5" checked>
-                    <label for="welcomeOn">تفعيل رسالة الترحيب</label>
-                </div>
-                <button onclick="saveWelcome()" class="btn-success w-full py-3 rounded-lg font-semibold">
+                <button onclick="saveWelcome()" class="btn-success w-full py-3">
                     <i class="fa fa-save ml-2"></i> حفظ إعدادات الترحيب
                 </button>
             </div>
@@ -127,19 +164,19 @@
         <div id="tickets" class="page">
             <h2 class="text-2xl font-bold mb-6">نظام التذاكر 🎫</h2>
             <div class="card p-6 space-y-4">
-                <div class="flex items-center gap-3">
-                    <input type="checkbox" id="ticketOn" class="w-5 h-5" checked>
-                    <label for="ticketOn">تفعيل نظام التذاكر</label>
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <span>تفعيل نظام التذاكر</span>
+                    <div id="tickets-enabled" class="toggle-switch on" onclick="toggleSwitch(this)"></div>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">نص زر فتح التذكرة:</label>
-                    <input type="text" id="ticketText" class="input-field w-full px-4 py-3" value="📩 افتح تذكرة جديدة">
+                    <input type="text" id="ticket-button-text" class="input-field" value="📩 اضغط هنا لفتح تذكرة دعم جديد">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-2">معرف رتبة المشرفين:</label>
-                    <input type="text" id="modRoleId" class="input-field w-full px-4 py-3" placeholder="أدخل المعرف...">
+                    <label class="block text-sm text-gray-400 mb-2">معرف رتبة المشرفين (لإشعارهم بالتذاكر الجديدة):</label>
+                    <input type="text" id="ticket-mod-role" class="input-field" placeholder="مثال: 1554408705020272662">
                 </div>
-                <button onclick="saveTickets()" class="btn-success w-full py-3 rounded-lg font-semibold">
+                <button onclick="saveTickets()" class="btn-success w-full py-3">
                     <i class="fa fa-save ml-2"></i> حفظ إعدادات التذاكر
                 </button>
             </div>
@@ -150,18 +187,27 @@
             <h2 class="text-2xl font-bold mb-6">إعدادات الحماية 🛡️</h2>
             <div class="card p-6 space-y-4">
                 <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <span>حظر الروابط</span>
-                    <input type="checkbox" id="blockLinks" class="w-5 h-5">
+                    <div>
+                        <p class="font-medium">حظر الروابط</p>
+                        <p class="text-xs text-gray-400">منع الأعضاء من إرسال روابط ومواقع</p>
+                    </div>
+                    <div id="sec-links" class="toggle-switch" onclick="toggleSwitch(this)"></div>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <span>منع حذف القنوات</span>
-                    <input type="checkbox" id="protectChannels" class="w-5 h-5" checked>
+                    <div>
+                        <p class="font-medium">حماية السيرفر</p>
+                        <p class="text-xs text-gray-400">منع حذف القنوات والرتب من قبل أشخاص آخرين</p>
+                    </div>
+                    <div id="sec-protect" class="toggle-switch on" onclick="toggleSwitch(this)"></div>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <span>تنبيه عند دخول بوت</span>
-                    <input type="checkbox" id="botAlert" class="w-5 h-5" checked>
+                    <div>
+                        <p class="font-medium">تنبيهات الأمان</p>
+                        <p class="text-xs text-gray-400">إرسال تنبيهات عند حدوث أي تغيير خطير</p>
+                    </div>
+                    <div id="sec-alerts" class="toggle-switch on" onclick="toggleSwitch(this)"></div>
                 </div>
-                <button onclick="saveSecurity()" class="btn-success w-full py-3 rounded-lg font-semibold mt-4">
+                <button onclick="saveSecurity()" class="btn-success w-full py-3 mt-4">
                     <i class="fa fa-shield ml-2"></i> حفظ إعدادات الحماية
                 </button>
             </div>
@@ -171,207 +217,14 @@
         <div id="points" class="page">
             <h2 class="text-2xl font-bold mb-6">النقاط والمتجر ⭐</h2>
             <div class="card p-6 space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">عدد النقاط لكل دعوة:</label>
-                    <input type="number" id="pointsPerInvite" class="input-field w-full px-4 py-3" value="10">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">رسالة الحصول على نقاط:</label>
-                    <input type="text" id="pointsMsg" class="input-field w-full px-4 py-3" value="✅ حصلت على نقاط جديدة!">
-                </div>
-                <div class="flex items-center gap-3">
-                    <input type="checkbox" id="pointsOn" class="w-5 h-5" checked>
-                    <label for="pointsOn">تفعيل نظام النقاط</label>
-                </div>
-                <button onclick="savePoints()" class="btn-success w-full py-3 rounded-lg font-semibold">
-                    <i class="fa fa-save ml-2"></i> حفظ إعدادات النقاط
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        // تبديل الصفحات
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
-
-        // رسالة تأكيد
-        function showToast() {
-            const t = document.getElementById('toast');
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        // نسخ الرابط
-        function copyInviteLink() {
-            const link = document.getElementById('inviteLink').innerText;
-            navigator.clipboard.writeText(link);
-            alert('✅ تم نسخ الرابط!');
-        }
-
-        // حفظ الترحيب
-        function saveWelcome() {
-            const data = {
-                message: document.getElementById('welcomeMsg').value,
-                image: document.getElementById('welcomeImg').value,
-                enabled: document.getElementById('welcomeOn').checked
-            };
-            localStorage.setItem('joker_welcome', JSON.stringify(data));
-            showToast();
-        }
-
-        // حفظ التذاكر
-        function saveTickets() {
-            const data = {
-                enabled: document.getElementById('ticketOn').checked,
-                buttonText: document.getElementById('ticketText').value,
-                modRole: document.getElementById('modRoleId').value
-            };
-            localStorage.setItem('joker_tickets', JSON.stringify(data));
-            showToast();
-        }
-
-        // حفظ الحماية
-        function saveSecurity() {
-            const data = {
-                blockLinks: document.getElementById('blockLinks').checked,
-                protectChannels: document.getElementById('protectChannels').checked,
-                botAlert: document.getElementById('botAlert').checked
-            };
-            localStorage.setItem('joker_security', JSON.stringify(data));
-            showToast();
-        }
-
-        // حفظ النقاط
-        function savePoints() {
-            const data = {
-                pointsPerInvite: document.getElementById('pointsPerInvite').value,
-                message: document.getElementById('pointsMsg').value,
-                enabled: document.getElementById('pointsOn').checked
-            };
-            localStorage.setItem('joker_points', JSON.stringify(data));
-            showToast();
-        }
-
-        // تحميل البيانات المحفوظة عند فتح الصفحة
-        window.onload = function() {
-            // تحميل إعدادات الترحيب
-            const welcome = localStorage.getItem('joker_welcome');
-            if (welcome) {
-                const w = JSON.parse(welcome);
-                document.getElementById('welcomeMsg').value = w.message || '';
-                document.getElementById('welcomeImg').value = w.image || '';
-                document.getElementById('welcomeOn').checked = w.enabled !== false;
-            }
-            // تحميل إعدادات التذاكر
-            const tickets = localStorage.getItem('joker_tickets');
-            if (tickets) {
-                const t = JSON.parse(tickets);
-                document.getElementById('ticketOn').checked = t.enabled !== false;
-                document.getElementById('ticketText').value = t.buttonText || '📩 افتح تذكرة جديدة';
-               
-n class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
-                    <i class="fa fa-save ml-2"></i> حفظ إعدادات الترحيب
-                </button>
-            </div>
-        </div>
-
-        <!-- صفحة التذاكر -->
-        <div id="tickets" class="page">
-            <h2 class="text-2xl font-bold mb-6">نظام التذاكر</h2>
-            <div class="card p-6 space-y-4">
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" class="w-4 h-4" checked>
-                    <label class="text-sm">تفعيل نظام التذاكر الفخم</label>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">معرف رتبة المشرفين</label>
-                    <input type="text" class="input-field w-full px-4 py-2" placeholder="أدخل المعرف">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">نص رسالة فتح التذكرة</label>
-                    <textarea class="input-field w-full px-4 py-2 h-24" placeholder="اضغط هنا لفتح تذكرة دعم جديد">اضغط هنا لفتح تذكرة دعم جديد</textarea>
-                </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
-                    <i class="fa fa-save ml-2"></i> حفظ إعدادات التذاكر
-                </button>
-            </div>
-        </div>
-
-        <!-- صفحة الحماية -->
-        <div id="security" class="page">
-            <h2 class="text-2xl font-bold mb-6">إعدادات الحماية</h2>
-            <div class="card p-6 space-y-4">
                 <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="font-medium">حظر الروابط</p>
-                        <p class="text-xs text-gray-400">منع الأعضاء من إرسال روابط</p>
-                    </div>
-                    <input type="checkbox" class="w-5 h-5">
-                </div>
-                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="font-medium">حماية من الحذف الجماعي</p>
-                        <p class="text-xs text-gray-400">منع حذف القنوات والرتب تلقائياً</p>
-                    </div>
-                    <input type="checkbox" class="w-5 h-5" checked>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="font-medium">كشف الروبوتات الجديدة</p>
-                        <p class="text-xs text-gray-400">تنبيه عند دخول بوت جديد للسيرفر</p>
-                    </div>
-                    <input type="checkbox" class="w-5 h-5" checked>
-                </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full mt-4">
-                    <i class="fa fa-shield ml-2"></i> حفظ إعدادات الحماية
-                </button>
-            </div>
-        </div>
-
-        <!-- صفحة النقاط والمتجر -->
-        <div id="points" class="page">
-            <h2 class="text-2xl font-bold mb-6">النقاط والمتجر</h2>
-            <div class="card p-6 space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">عدد النقاط لكل دعوة ناجحة</label>
-                    <input type="number" value="10" class="input-field w-full px-4 py-2">
+                    <span>تفعيل نظام النقاط</span>
+                    <div id="points-enabled" class="toggle-switch on" onclick="toggleSwitch(this)"></div>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">رسالة عند الحصول على نقاط</label>
-                    <input type="text" value="✅ حصلت على نقاط جديدة!" class="input-field w-full px-4 py-2">
+                    <label class="block text-sm text-gray-400 mb-2">عدد النقاط لكل دعوة ناجحة:</label>
+                    <input type="number" id="points-per-invite" class="input-field" value="10" min="1">
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" class="w-4 h-4" checked>
-                    <label class="text-sm">تفعيل نظام النقاط</label>
-                </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
-                    <i class="fa fa-shopping-cart ml-2"></i> حفظ إعدادات المتجر
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        // تبديل الصفحات
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', e => {
-                e.preventDefault();
-                document.querySelectorAll('.sidebar-item').forEach(i => {
-                    i.classList.remove('active');
-                    i.classList.add('text-gray-400');
-                });
-                item.classList.add('active');
-                item.classList.remove('text-gray-400');
-                
-                const pageId = item.getAttribute('data-page');
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(pageId).classList.add('active');
-            });
-        });
-
-        function switch
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">رسالة عند الحصول على نقاط:</label>
+                    <input type="text" id="points-message" class="input-field" value="✅ أح
