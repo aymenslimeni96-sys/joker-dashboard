@@ -1,124 +1,337 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101116">
-<title>لوحة تحكم JOKER</title>
-<style>
-:root{--bg:#0d0f14;--panel:#171a22;--panel2:#1d222d;--line:#2b303d;--red:#e33b49;--red2:#8f2530;--txt:#f4f5f8;--muted:#a0a7b5;--green:#35c58a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:Tahoma,Arial,sans-serif}
-button,input,textarea,select{font:inherit}button{cursor:pointer}
-.layout{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
-.sidebar{background:#12151c;border-left:1px solid var(--line);padding:22px 15px;position:sticky;top:0;height:100vh}
-.logo{font-size:25px;font-weight:900;letter-spacing:2px;padding:7px 12px 25px}.logo b{color:var(--red)}
-.server{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:22px;color:var(--muted);font-size:13px}
-.server strong{display:block;color:var(--txt);font-size:14px;margin-bottom:5px}
-.navtitle{font-size:11px;color:#727b8c;padding:8px 12px}
-.nav button{width:100%;border:0;background:transparent;color:var(--muted);text-align:right;padding:12px;border-radius:10px;margin:3px 0;font-size:14px}
-.nav button:hover,.nav button.active{background:#352027;color:#fff}.nav button.active{border-right:3px solid var(--red)}
-.main{padding:25px;max-width:1200px;width:100%;margin:auto}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}
-.top h1{font-size:23px;margin:0}.status{background:#182a25;color:#7ee0b5;border:1px solid #285341;padding:8px 12px;border-radius:30px;font-size:12px}
-.hero{background:linear-gradient(115deg,#321820,#1b202b 72%);border:1px solid #592b35;border-radius:18px;padding:24px;margin-bottom:18px}
-.hero h2{margin:0 0 8px;font-size:22px}.hero p{color:#c1c5ce;line-height:1.8;margin:0;font-size:14px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}
-.statlabel{color:var(--muted);font-size:12px}.statnum{font-size:24px;font-weight:800;margin-top:9px}
-.content{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:15px}
-.section{display:none}.section.show{display:block}
-.section h2{font-size:18px;margin:0 0 7px}.desc{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 18px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
-.row:last-child{border-bottom:0}.row strong{font-size:14px}.row small{display:block;color:var(--muted);font-size:12px;margin-top:5px}
-.switch{width:46px;height:25px;border-radius:20px;background:#3a404d;border:0;padding:3px;flex-shrink:0}
-.switch:after{content:"";display:block;width:19px;height:19px;border-radius:50%;background:#fff;transition:.2s}
-.switch.on{background:var(--red)}.switch.on:after{transform:translateX(-21px)}
-.field{margin:14px 0}.field label{display:block;font-size:13px;margin-bottom:8px;color:#dfe2e8}
-.field input,.field textarea,.field select{width:100%;background:#10131a;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:12px;outline:none}
-.field textarea{min-height:85px;resize:vertical}.btn{background:var(--red);border:0;color:#fff;border-radius:10px;padding:11px 16px;font-weight:700}.btn.secondary{background:var(--panel2);border:1px solid var(--line)}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
-.sidecard h3{font-size:15px;margin:0 0 12px}.sidecard p{color:var(--muted);font-size:12px;line-height:1.8}
-.notice{border:1px solid #6b4b2b;background:#2a2118;color:#e9c18c;padding:12px;border-radius:11px;font-size:12px;line-height:1.8;margin-top:14px}
-.mobilehead{display:none}
-footer{text-align:center;color:#737c8b;font-size:11px;padding:25px}
-@media(max-width:850px){.layout{grid-template-columns:1fr}.sidebar{height:auto;position:relative;padding:12px}.logo{padding:4px 8px 12px}.server{margin-bottom:10px}.nav{display:flex;overflow:auto;gap:5px}.navtitle{display:none}.nav button{white-space:nowrap;width:auto;padding:10px}.main{padding:16px}.content{grid-template-columns:1fr}.sidecard{order:2}.stats{grid-template-columns:repeat(2,1fr)}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم JOKER 🃏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #00bfff;
+            --secondary: #a855f7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f8fafc;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            border-right: 3px solid transparent;
+        }
+        
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent);
+            border-right-color: var(--primary);
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid rgba(0,191,255,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00bfff, #0080ff);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,191,255,0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16,185,129,0.3);
+        }
+        
+        .input-field {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            border-radius: 8px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,191,255,0.2);
+        }
+        
+        .status-connected {
+            background-color: rgba(16,185,129,0.2);
+            color: #10b981;
+        }
+        
+        .status-disconnected {
+            background-color: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+    </style>
 </head>
-<body>
-<div class="layout">
-<aside class="sidebar">
-  <div class="logo">JOKER<b>_</b></div>
-  <div class="server"><strong>إعدادات السيرفر</strong>اختر سيرفرك لبدء الإدارة</div>
-  <div class="navtitle">لوحة الإدارة</div>
-  <nav class="nav">
-    <button class="active" data-page="home">🏠 الرئيسية</button>
-    <button data-page="tickets">🎫 التذاكر</button>
-    <button data-page="welcome">👋 الترحيب</button>
-    <button data-page="events">🎉 الفعاليات</button>
-    <button data-page="security">🛡️ الحماية</button>
-    <button data-page="autoreplies">💬 الردود التلقائية</button>
-  </nav>
-</aside>
-<main class="main">
-  <header class="top"><h1 id="pageTitle">الرئيسية</h1><span class="status">● واجهة تجريبية</span></header>
-  <section id="home" class="section show">
-    <div class="hero"><h2>مرحباً بك في لوحة تحكم JOKER</h2><p>تحكم بإعدادات بوتك من مكان واحد، بواجهة عربية وتصميم داكن باللون الأحمر. اختر القسم من القائمة للبدء.</p></div>
-    <div class="stats">
-      <div class="card"><div class="statlabel">حالة الربط</div><div class="statnum">غير مربوط</div></div>
-      <div class="card"><div class="statlabel">السيرفرات</div><div class="statnum">0</div></div>
-      <div class="card"><div class="statlabel">التذاكر المفتوحة</div><div class="statnum">0</div></div>
-      <div class="card"><div class="statlabel">أنظمة الحماية</div><div class="statnum">5</div></div>
-    </div>
-    <div class="card"><h2>ابدأ الإعداد</h2><p class="desc">افتح أحد الأقسام من القائمة الجانبية واضبط الخيارات الظاهرة.</p><div class="actions"><button class="btn" data-goto="tickets">إعداد التذاكر</button><button class="btn secondary" data-goto="welcome">إعداد الترحيب</button></div></div>
-  </section>
-  <section id="tickets" class="section card">
-    <h2>🎫 نظام التذاكر</h2><p class="desc">إعدادات استقبال طلبات الأعضاء والدعم الفني.</p>
-    <div class="row"><div><strong>تفعيل نظام التذاكر</strong><small>تشغيل أو إيقاف نظام التذاكر</small></div><button class="switch" aria-label="تفعيل نظام التذاكر"></button></div>
-    <div class="field"><label>اسم زر فتح التذكرة</label><input placeholder="🎫 فتح تذكرة"></div>
-    <div class="field"><label>رسالة لوحة التذاكر</label><textarea placeholder="اضغط على الزر أدناه لفتح تذكرة مع فريق الدعم..."></textarea></div>
-    <div class="field"><label>اسم رتبة فريق الدعم</label><input placeholder="@الدعم الفني"></div>
-    <button class="btn save">حفظ الإعدادات</button>
-  </section>
-  <section id="welcome" class="section card">
-    <h2>👋 نظام الترحيب</h2><p class="desc">جهّز رسالة ترحيب تظهر للأعضاء الجدد.</p>
-    <div class="row"><div><strong>تفعيل الترحيب</strong><small>إرسال رسالة عند دخول عضو جديد</small></div><button class="switch" aria-label="تفعيل الترحيب"></button></div>
-    <div class="field"><label>قناة الترحيب</label><input placeholder="#・الترحيب"></div>
-    <div class="field"><label>نص رسالة الترحيب</label><textarea placeholder="أهلاً بك {user} في سيرفرنا!"></textarea></div>
-    <div class="field"><label>لون رسالة الترحيب</label><select><option>أحمر</option><option>أزرق</option><option>أخضر</option></select></div>
-    <button class="btn save">حفظ الإعدادات</button>
-  </section>
-  <section id="events" class="section card">
-    <h2>🎉 الفعاليات</h2><p class="desc">إعداد فعاليات ومسابقات السيرفر.</p>
-    <div class="row"><div><strong>تفعيل نظام الفعاليات</strong><small>السماح بإعداد فعاليات للأعضاء</small></div><button class="switch" aria-label="تفعيل الفعاليات"></button></div>
-    <div class="field"><label>اسم الفعالية</label><input placeholder="مسابقة JOKER الأسبوعية"></div>
-    <div class="field"><label>وصف الفعالية</label><textarea placeholder="اكتب تفاصيل الفعالية وشروط المشاركة..."></textarea></div>
-    <div class="field"><label>موعد الفعالية</label><input type="datetime-local"></div>
-    <button class="btn save">حفظ الفعالية</button>
-  </section>
-  <section id="security" class="section card">
-    <h2>🛡️ الحماية</h2><p class="desc">خيارات حماية تجريبية يمكن ربطها بالبوت لاحقاً.</p>
-    <div class="row"><div><strong>منع الروابط</strong><small>إيقاف الروابط غير المسموح بها</small></div><button class="switch"></button></div>
-    <div class="row"><div><strong>منع السبام</strong><small>الحد من الرسائل المتكررة</small></div><button class="switch"></button></div>
-    <div class="row"><div><strong>منع الإشارات الجماعية</strong><small>الحماية من منشن الجميع</small></div><button class="switch"></button></div>
-    <div class="row"><div><strong>منع دخول الحسابات المشبوهة</strong><small>خيار إعداد أولي</small></div><button class="switch"></button></div>
-    <button class="btn save">حفظ إعدادات الحماية</button>
-  </section>
-  <section id="autoreplies" class="section card">
-    <h2>💬 الردود التلقائية</h2><p class="desc">أضف كلمة أو عبارة، وحدد الرد الذي يرسله البوت عند ظهورها.</p>
-    <div class="field"><label>الكلمة أو العبارة</label><input id="trigger" placeholder="مثال: السلام عليكم"></div>
-    <div class="field"><label>الرد التلقائي</label><textarea id="reply" placeholder="وعليكم السلام ورحمة الله وبركاته"></textarea></div>
-    <button class="btn" id="addReply">إضافة رد</button>
-    <div id="replyList" style="margin-top:15px"></div>
-  </section>
-  <aside class="card sidecard" style="margin-top:16px">
-    <h3>معلومات مهمة</h3><p>هذه نسخة واجهة أولية لرفعها على GitHub وتجربة شكل لوحة التحكم. الأزرار والحقول تعمل داخل الصفحة للتجربة فقط.</p>
-    <div class="notice">تنبيه: اللوحة غير متصلة حالياً ببوت Discord. يلزم لاحقاً إنشاء البوت والواجهة الخلفية وتسجيل الدخول الآمن حتى تصبح الإعدادات حقيقية.</div>
-  </aside>
-  <footer>JOKER Dashboard · نسخة البداية</footer>
-</main>
-</div>
-<script>
-const titles={home:"الرئيسية",tickets:"التذاكر",welcome:"الترحيب",events:"الفعاليات",security:"الحماية",autoreplies:"الردود التلقائية"};
+<body class="flex">
+    <!-- الشريط الجانبي -->
+    <aside class="w-64 min-h-screen bg-slate-900/50 border-l border-cyan-500/10 p-4 fixed right-0 top-0 bottom-0 z-10">
+        <div class="text-center mb-8 pt-4">
+            <h1 class="text-2xl font-bold text-cyan-400">🃏 JOKER</h1>
+            <p class="text-sm text-gray-400 mt-1">لوحة تحكم البوت</p>
+        </div>
+        
+        <nav class="space-y-2">
+            <a href="#" class="sidebar-item active block py-3 px-4 rounded-l-lg" data-page="home">
+                <i class="fa fa-home ml-2"></i> الرئيسية
+            </a>
+            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="welcome">
+                <i class="fa fa-hand-paper-o ml-2"></i> الترحيب
+            </a>
+            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="tickets">
+                <i class="fa fa-ticket ml-2"></i> التذاكر
+            </a>
+            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="settings">
+                <i class="fa fa-cog ml-2"></i> إعدادات البوت
+            </a>
+            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="security">
+                <i class="fa fa-shield ml-2"></i> الحماية
+            </a>
+            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="points">
+                <i class="fa fa-star ml-2"></i> النقاط والمتجر
+            </a>
+        </nav>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="mr-64 flex-1 p-6">
+        <!-- الصفحة الرئيسية -->
+        <div id="home" class="page active">
+            <h2 class="text-2xl font-bold mb-6">مرحباً بك 🃏</h2>
+            <p class="text-gray-400 mb-8">من هنا تتحكم بجميع إعدادات بوت JOKER الخاص بك</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">حالة الاتصال</h3>
+                    <div id="configStatus" class="inline-flex items-center gap-2 status-disconnected px-3 py-1 rounded-full text-sm">
+                        <span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
+                        غير متصل
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">معلومات السيرفر</h3>
+                    <p class="text-gray-400">عدد الأعضاء: <span class="text-white font-bold">0</span></p>
+                    <p class="text-gray-400">القنوات: <span class="text-white font-bold">0</span></p>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-4">إعدادات الاتصال بالبوت</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">معرف العميل (Client ID)</label>
+                        <input type="text" id="clientId" class="input-field w-full px-4 py-2" placeholder="أدخل معرف العميل">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">رمز التوكن (Bot Token)</label>
+                        <input type="password" id="botToken" class="input-field w-full px-4 py-2" placeholder="أدخل رمز التوكن">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">معرف السيرفر (Guild ID)</label>
+                        <input type="text" id="guildId" class="input-field w-full px-4 py-2" placeholder="أدخل معرف السيرفر">
+                    </div>
+                    <button onclick="saveConfig()" class="btn-success px-6 py-2 rounded-lg font-semibold w-full">
+                        <i class="fa fa-save ml-2"></i> حفظ الإعدادات
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- صفحة الترحيب -->
+        <div id="welcome" class="page">
+            <h2 class="text-2xl font-bold mb-6">إعداد رسالة الترحيب</h2>
+            <div class="card p-6 space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">نص رسالة الترحيب</label>
+                    <textarea id="welcomeMessage" class="input-field w-full px-4 py-2 h-32" placeholder="أهلاً بك في السيرفر! 🎉"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">رابط صورة الترحيب (اختياري)</label>
+                    <input type="text" id="welcomeImage" class="input-field w-full px-4 py-2" placeholder="ألصق رابط الصورة هنا">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="welcomeEnabled" class="w-4 h-4">
+                    <label for="welcomeEnabled" class="text-sm">تفعيل رسالة الترحيب</label>
+                </div>
+                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
+                    <i class="fa fa-save ml-2"></i> حفظ إعدادات الترحيب
+                </button>
+            </div>
+        </div>
+
+        <!-- صفحة التذاكر -->
+        <div id="tickets" class="page">
+            <h2 class="text-2xl font-bold mb-6">نظام التذاكر</h2>
+            <div class="card p-6 space-y-4">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="ticketEnabled" class="w-4 h-4" checked>
+                    <label for="ticketEnabled" class="text-sm">تفعيل نظام التذاكر الفخم</label>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">معرف رتبة المشرفين</label>
+                    <input type="text" class="input-field w-full px-4 py-2" placeholder="أدخل المعرف">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">نص رسالة فتح التذكرة</label>
+                    <textarea class="input-field w-full px-4 py-2 h-24" placeholder="اضغط هنا لفتح تذكرة دعم جديد"></textarea>
+                </div>
+                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
+                    <i class="fa fa-save ml-2"></i> حفظ إعدادات التذاكر
+                </button>
+            </div>
+        </div>
+
+        <!-- صفحة الحماية -->
+        <div id="security" class="page">
+            <h2 class="text-2xl font-bold mb-6">إعدادات الحماية</h2>
+            <div class="card p-6 space-y-4">
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <div>
+                        <p class="font-medium">حظر الروابط</p>
+                        <p class="text-xs text-gray-400">منع الأعضاء من إرسال روابط</p>
+                    </div>
+                    <input type="checkbox" class="w-5 h-5">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <div>
+                        <p class="font-medium">حماية من الحذف الجماعي</p>
+                        <p class="text-xs text-gray-400">منع حذف القنوات والرتب تلقائياً</p>
+                    </div>
+                    <input type="checkbox" class="w-5 h-5" checked>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <div>
+                        <p class="font-medium">كشف الروبوتات الجديدة</p>
+                        <p class="text-xs text-gray-400">تنبيه عند دخول بوت جديد للسيرفر</p>
+                    </div>
+                    <input type="checkbox" class="w-5 h-5" checked>
+                </div>
+                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full mt-4">
+                    <i class="fa fa-shield ml-2"></i> حفظ إعدادات الحماية
+                </button>
+            </div>
+        </div>
+
+        <!-- صفحة النقاط والمتجر -->
+        <div id="points" class="page">
+            <h2 class="text-2xl font-bold mb-6">النقاط والمتجر</h2>
+            <div class="card p-6 space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">عدد النقاط لكل دعوة ناجحة</label>
+                    <input type="number" value="10" class="input-field w-full px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">رسالة عند الحصول على نقاط</label>
+                    <input type="text" value="✅ حصلت على نقاط جديدة!" class="input-field w-full px-4 py-2">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="pointsEnabled" class="w-4 h-4" checked>
+                    <label for="pointsEnabled" class="text-sm">تفعيل نظام النقاط</label>
+                </div>
+                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
+                    <i class="fa fa-shopping-cart ml-2"></i> حفظ إعدادات المتجر
+                </button>
+            </div>
+        </div>
+
+        <!-- صفحة الإعدادات -->
+        <div id="settings" class="page">
+            <h2 class="text-2xl font-bold mb-6">إعدادات عامة</h2>
+            <div class="card p-6 space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">اسم البوت</label>
+                    <input type="text" value="JOKER" class="input-field w-full px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">حالة البوت (النص الذي يظهر تحت اسمه)</label>
+                    <input type="text" value="بوت الخدمة 🃏" class="input-field w-full px-4 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">بادئة الأوامر</label>
+                    <input type="text" value="!" class="input-field w-full px-4 py-2">
+                </div>
+                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
+                    <i class="fa fa-cog ml-2"></i> حفظ الإعدادات العامة
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // تبديل الصفحات
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.add('text-gray-400'));
+                item.classList.add('active');
+                item.classList.remove('text-gray-400');
+                
+                const pageId = item.getAttribute('data-page');
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+
+        // حفظ إعدادات الاتصال
+        function saveConfig() {
+            const clientId = document.getElementById('clientId').value;
+            const token = document.getElementById('botToken').value;
+            const guildId = document.getElementById('guildId').value;
+            const statusEl = document.getElementById('configStatus');
+            
+            if (!clientId || !token || !guildId) {
+                statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500 inline-block"></span> بيانات غير مكتملة';
+                statusEl.className = 'inline-flex items-center gap-2 status-disconnected px-3 py-1 rounded-full text-sm';
+                return;
+            }
+            
+            localStorage.setItem('
+اية",autoreplies:"الردود التلقائية"};
 function showPage(id){document.querySelectorAll(".section").forEach(s=>s.classList.remove("show"));document.getElementById(id).classList.add("show");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));document.getElementById("pageTitle").textContent=titles[id];}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.goto)));
