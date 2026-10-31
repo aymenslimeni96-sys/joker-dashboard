@@ -3,124 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم JOKER 🃏</title>
+    <title>إضافة بوت JOKER 🃏</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
         * { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --bg-dark: #0f172a; --bg-card: #1e293b; --primary: #00bfff; --success: #10b981; --text: #f8fafc; }
-        body { background-color: var(--bg-dark); color: var(--text); min-height: 100vh; }
-        .sidebar-item { transition: all 0.3s ease; border-right: 3px solid transparent; }
-        .sidebar-item:hover, .sidebar-item.active { background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent); border-right-color: var(--primary); }
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      </div>
-                    <input type="checkbox" class="w-5 h-5">
-                </div>
-                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="font-medium">حماية من الحذف الجماعي</p>
-                        <p class="text-xs text-gray-400">منع حذف القنوات والرتب تلقائياً</p>
-                    </div>
-                    <input type="checkbox" class="w-5 h-5" checked>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <div>
-                        <p class="font-medium">كشف الروبوتات الجديدة</p>
-                        <p class="text-xs text-gray-400">تنبيه عند دخول بوت جديد للسيرفر</p>
-                    </div>
-                    <input type="checkbox" class="w-5 h-5" checked>
-                </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full mt-4">
-                    <i class="fa fa-shield ml-2"></i> حفظ إعدادات الحماية
-                </button>
-            </div>
+        body { background: linear-gradient(135deg, #0f172a, #1e293b); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #f8fafc; }
+        .card { background: #1e293b; border-radius: 16px; border: 1px solid rgba(0,191,255,0.2); box-shadow: 0 0 40px rgba(0,191,255,0.1); max-width: 480px; width: 90%; padding: 2rem; text-align: center; }
+        .btn-primary { background: linear-gradient(135deg, #00bfff, #0080ff); transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 700; font-size: 1.1rem; color: white; text-decoration: none; width: 100%; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,191,255,0.35); }
+        .input-field { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; padding: 0.75rem 1rem; width: 100%; font-size: 1rem; text-align: center; }
+        .input-field:focus { outline: none; border-color: #00bfff; box-shadow: 0 0 0 3px rgba(0,191,255,0.2); }
+        .link-box { background: rgba(0,191,255,0.08); border: 1px dashed #00bfff; border-radius: 8px; padding: 1rem; margin: 1rem 0; word-break: break-all; font-size: 0.85rem; color: #93c5fd; }
+        .btn-copy { background: rgba(0,191,255,0.15); border: none; color: #00bfff; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: all 0.2s; }
+        .btn-copy:hover { background: rgba(0,191,255,0.25); }
+        .steps { text-align: right; margin-top: 2rem; }
+        .steps div { padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1 class="text-3xl font-bold text-cyan-400 mb-2">🃏 JOKER Bot</h1>
+        <p class="text-gray-400 mb-6">أضف البوت إلى سيرفرك بضغطة زر واحدة</p>
+        
+        <div class="mb-4">
+            <label class="block text-sm text-gray-400 mb-2">أدخل معرف بوتك (Client ID):</label>
+            <input type="text" id="clientId" class="input-field" placeholder="مثال: 1554408705020272662" oninput="createLink()">
         </div>
 
-        <!-- صفحة النقاط والمتجر -->
-        <div id="points" class="page">
-            <h2 class="text-2xl font-bold mb-6">النقاط والمتجر</h2>
-            <div class="card p-6 space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">عدد النقاط لكل دعوة ناجحة</label>
-                    <input type="number" value="10" class="input-field w-full px-4 py-2">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">رسالة عند الحصول على نقاط</label>
-                    <input type="text" value="✅ حصلت على نقاط جديدة!" class="input-field w-full px-4 py-2">
-                </div>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="pointsEnabled" class="w-4 h-4" checked>
-                    <label for="pointsEnabled" class="text-sm">تفعيل نظام النقاط</label>
-                </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
-                    <i class="fa fa-shopping-cart ml-2"></i> حفظ إعدادات المتجر
-                </button>
-            </div>
+        <div class="mb-4">
+            <label class="block text-sm text-gray-400 mb-2">🔗 رابط الإضافة جاهز:</label>
+            <div class="link-box" id="linkOutput">اكتب المعرف أعلاه وسيظهر الرابط هنا تلقائياً...</div>
+            <button class="btn-copy" onclick="copyLink()" id="copyBtn" disabled>
+                <i class="fa fa-copy ml-1"></i> نسخ الرابط
+            </button>
         </div>
 
-        <!-- صفحة الإعدادات -->
-        <div id="settings" class="page">
-            <h2 class="text-2xl font-bold mb-6">إعدادات عامة</h2>
-            <div class="card p-6 space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">اسم البوت</label>
-                    <input type="text" value="JOKER" class="input-field w-full px-4 py-2">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">حالة البوت (النص الذي يظهر تحت اسمه)</label>
-                    <input type="text" value="بوت الخدمة 🃏" class="input-field w-full px-4 py-2">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">بادئة الأوامر</label>
-                    <input type="text" value="!" class="input-field w-full px-4 py-2">
-                </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
-                    <i class="fa fa-cog ml-2"></i> حفظ الإعدادات العامة
-                </button>
-            </div>
+        <a id="inviteLink" href="" target="_blank" class="btn-primary mt-4" style="opacity: 0.5; pointer-events: none;">
+            <i class="fa fa-plus-circle"></i> اضغط هنا لإضافة البوت لسيرفرك
+        </a>
+
+        <div class="steps mt-8 text-left">
+            <h3 class="font-bold text-cyan-300 mb-3"><i class="fa fa-info-circle ml-2"></i> طريقة الإضافة:</h3>
+            <div>1️⃣ أدخل معرف بوتك في المربع أعلاه</div>
+            <div>2️⃣ انسخ الرابط أو اضغط على الزر الأزرق</div>
+            <div>3️⃣ اختر سيرفرك من القائمة</div>
+            <div>4️⃣ اضغط <strong>تفويض / Autoriser</strong> ✅</div>
+            <div>5️⃣ تم! البوت دخل سيرفرك بنجاح 🎉</div>
         </div>
-    </main>
+    </div>
 
     <script>
-        // تبديل الصفحات
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', e => {
-                e.preventDefault();
-                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.add('text-gray-400'));
-                item.classList.add('active');
-                item.classList.remove('text-gray-400');
-                
-                const pageId = item.getAttribute('data-page');
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(pageId).classList.add('active');
-            });
-        });
-
-        // حفظ إعدادات الاتصال
-        function saveConfig() {
-            const clientId = document.getElementById('clientId').value;
-            const token = document.getElementById('botToken').value;
-            const guildId = document.getElementById('guildId').value;
-            const statusEl = document.getElementById('configStatus');
+        function createLink() {
+            const id = document.getElementById('clientId').value.trim();
+            const base = 'https://discord.com/oauth2/authorize?client_id=';
+            const scope = '&scope=bot&permissions=8';
             
-            if (!clientId || !token || !guildId) {
-                statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500 inline-block"></span> بيانات غير مكتملة';
-                statusEl.className = 'inline-flex items-center gap-2 status-disconnected px-3 py-1 rounded-full text-sm';
-                return;
+            if (id.length >= 17) {
+                const fullLink = base + id + scope;
+                document.getElementById('linkOutput').innerText = fullLink;
+                document.getElementById('inviteLink').href = fullLink;
+                document.getElementById('inviteLink').style.opacity = '1';
+                document.getElementById('inviteLink').style.pointerEvents = 'auto';
+                document.getElementById('copyBtn').disabled = false;
+            } else {
+                document.getElementById('linkOutput').innerText = 'اكتب المعرف أعلاه وسيظهر الرابط هنا تلقائياً...';
+                document.getElementById('inviteLink').href = '';
+                document.getElementById('inviteLink').style.opacity = '0.5';
+                document.getElementById('inviteLink').style.pointerEvents = 'none';
+                document.getElementById('copyBtn').disabled = true;
             }
-            
-            localStorage.setItem('
-اية",autoreplies:"الردود التلقائية"};
-function showPage(id){document.querySelectorAll(".section").forEach(s=>s.classList.remove("show"));document.getElementById(id).classList.add("show");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));document.getElementById("pageTitle").textContent=titles[id];}
-document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.goto)));
-document.querySelectorAll(".switch").forEach(b=>b.addEventListener("click",()=>b.classList.toggle("on")));
-document.querySelectorAll(".save").forEach(b=>b.addEventListener("click",()=>{b.textContent="تم الحفظ محلياً";setTimeout(()=>b.textContent="حفظ الإعدادات",1600)}));
-document.getElementById("addReply").addEventListener("click",()=>{const t=document.getElementById("trigger"),r=document.getElementById("reply");if(!t.value.trim()||!r.value.trim()){alert("اكتب العبارة والرد أولاً");return}const item=document.createElement("div");item.className="row";const info=document.createElement("div");const strong=document.createElement("strong");strong.textContent=t.value;const small=document.createElement("small");small.textContent=r.value;info.append(strong,small);const del=document.createElement("button");del.className="btn secondary";del.textContent="حذف";del.onclick=()=>item.remove();item.append(info,del);document.getElementById("replyList").append(item);t.value="";r.value=""});
-</script>
+        }
+
+        function copyLink() {
+            const linkText = document.getElementById('linkOutput').innerText;
+            navigator.clipboard.writeText(linkText).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = '<i class="fa fa-check ml-1"></i> تم النسخ! ✅';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa fa-copy ml-1"></i> نسخ الرابط';
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
