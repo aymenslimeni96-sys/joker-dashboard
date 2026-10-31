@@ -8,227 +8,273 @@
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
-        
-        * {
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --primary: #00bfff;
-            --secondary: #a855f7;
-            --success: #10b981;
-            --danger: #ef4444;
-            --text: #f8fafc;
-        }
-        
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text);
-            min-height: 100vh;
-        }
-        
-        .sidebar-item {
-            transition: all 0.3s ease;
-            border-right: 3px solid transparent;
-        }
-        
-        .sidebar-item:hover,
-        .sidebar-item.active {
-            background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent);
-            border-right-color: var(--primary);
-        }
-        
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .card {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid rgba(0,191,255,0.1);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #00bfff, #0080ff);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,191,255,0.3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(16,185,129,0.3);
-        }
-        
-        .input-field {
-            background-color: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text);
-            border-radius: 8px;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,191,255,0.2);
-        }
-        
-        .status-connected {
-            background-color: rgba(16,185,129,0.2);
-            color: #10b981;
-        }
-        
-        .status-disconnected {
-            background-color: rgba(239,68,68,0.2);
-            color: #ef4444;
-        }
-        
-        .link-box {
-            background-color: rgba(0,191,255,0.1);
-            border: 1px dashed var(--primary);
-            border-radius: 8px;
-        }
+        * { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-dark: #0f172a; --bg-card: #1e293b; --primary: #00bfff; --success: #10b981; --danger: #ef4444; --text: #f8fafc; }
+        body { background-color: var(--bg-dark); color: var(--text); min-height: 100vh; }
+        .sidebar-item { transition: all 0.3s ease; border-right: 3px solid transparent; cursor: pointer; }
+        .sidebar-item:hover, .sidebar-item.active { background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent); border-right-color: var(--primary); }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background-color: var(--bg-card); border-radius: 12px; border: 1px solid rgba(0,191,255,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #00bfff, #0080ff); transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,191,255,0.3); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(16,185,129,0.3); }
+        .input-field { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 8px; }
+        .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,191,255,0.2); }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; z-index: 9999; display: none; }
+        .toast.show { display: block; animation: fadeIn 0.3s ease; }
+        .link-box { background: rgba(0,191,255,0.08); border: 1px dashed #00bfff; border-radius: 8px; padding: 1rem; word-break: break-all; font-size: 0.85rem; color: #93c5fd; }
     </style>
 </head>
 <body class="flex">
+    <!-- رسالة نجاح -->
+    <div id="toast" class="toast">✅ تم الحفظ بنجاح!</div>
+
     <!-- الشريط الجانبي -->
     <aside class="w-64 min-h-screen bg-slate-900/50 border-l border-cyan-500/10 p-4 fixed right-0 top-0 bottom-0 z-10">
         <div class="text-center mb-8 pt-4">
             <h1 class="text-2xl font-bold text-cyan-400">🃏 JOKER</h1>
             <p class="text-sm text-gray-400 mt-1">لوحة تحكم البوت</p>
-            <div class="mt-3 inline-flex items-center gap-2 status-connected px-3 py-1 rounded-full text-xs">
-                <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+            <div class="mt-3 inline-flex items-center gap-2 text-green-400 text-sm">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
                 جاهز
             </div>
         </div>
-        
         <nav class="space-y-2">
-            <a href="#" class="sidebar-item active block py-3 px-4 rounded-l-lg" data-page="home">
+            <div class="sidebar-item active block py-3 px-4 rounded-l-lg" onclick="showPage('home')">
                 <i class="fa fa-home ml-2"></i> الرئيسية
-            </a>
-            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="invite">
+            </div>
+            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('invite')">
                 <i class="fa fa-link ml-2"></i> رابط الدعوة
-            </a>
-            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="welcome">
+            </div>
+            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('welcome')">
                 <i class="fa fa-hand-paper-o ml-2"></i> الترحيب
-            </a>
-            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="tickets">
+            </div>
+            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('tickets')">
                 <i class="fa fa-ticket ml-2"></i> التذاكر
-            </a>
-            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="security">
+            </div>
+            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('security')">
                 <i class="fa fa-shield ml-2"></i> الحماية
-            </a>
-            <a href="#" class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" data-page="points">
+            </div>
+            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('points')">
                 <i class="fa fa-star ml-2"></i> النقاط والمتجر
-            </a>
+            </div>
         </nav>
     </aside>
 
     <!-- المحتوى الرئيسي -->
     <main class="mr-64 flex-1 p-6">
-        <!-- الصفحة الرئيسية -->
+        <!-- الرئيسية -->
         <div id="home" class="page active">
             <h2 class="text-2xl font-bold mb-6">مرحباً بك 🃏</h2>
             <p class="text-gray-400 mb-8">تحكم بجميع إعدادات بوت JOKER الخاص بك بسهولة وأمان</p>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div class="card p-6">
                     <h3 class="text-lg font-semibold mb-4">معلومات البوت</h3>
                     <p class="text-gray-400">اسم البوت: <span class="text-white font-bold">JOKER</span></p>
-                    <p class="text-gray-400">معرف العميل: <span class="text-cyan-400 font-bold">1565393363828744302</span></p>
-                    <p class="text-gray-400 mt-2">الحالة: 
-                        <span class="inline-flex items-center gap-1 text-green-400">
-                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                            جاهز للإضافة
-                        </span>
-                    </p>
+                    <p class="text-gray-400">المعرف: <span class="text-cyan-400 font-bold">1565393363828744302</span></p>
                 </div>
                 <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-4">إحصائيات السيرفر</h3>
-                    <p class="text-gray-400">عدد الأعضاء: <span class="text-white font-bold">--</span></p>
-                    <p class="text-gray-400">القنوات النشطة: <span class="text-white font-bold">--</span></p>
-                    <p class="text-gray-400">الدعوات الناجحة: <span class="text-white font-bold">0</span></p>
+                    <h3 class="text-lg font-semibold mb-4">إحصائيات</h3>
+                    <p class="text-gray-400">الدعوات: <span id="inviteCount" class="text-white font-bold">0</span></p>
+                    <p class="text-gray-400">النقاط: <span id="totalPoints" class="text-white font-bold">0</span></p>
                 </div>
-            </div>
-            
-            <div class="card p-6">
-                <h3 class="text-lg font-semibold mb-4">🚀 الخطوة الأولى</h3>
-                <p class="text-gray-300 mb-4">اذهب لصفحة <span class="text-cyan-400 font-bold">"رابط الدعوة"</span> من القائمة الجانبية لنسخ الرابط وإضافة البوت لسيرفرك</p>
-                <a href="#" onclick="switchPage('invite')" class="btn-primary inline-block px-6 py-2 rounded-lg font-semibold">
-                    <i class="fa fa-arrow-left mr-2"></i> اذهب لرابط الدعوة
-                </a>
             </div>
         </div>
 
-        <!-- صفحة رابط الدعوة -->
+        <!-- رابط الدعوة -->
         <div id="invite" class="page">
-            <h2 class="text-2xl font-bold mb-6">رابط دعوة البوت 🚀</h2>
+            <h2 class="text-2xl font-bold mb-6">رابط الدعوة 🚀</h2>
             <div class="card p-6 space-y-4">
-                <p class="text-gray-400">انسخ الرابط أدناه وأرسله لأصدقائك ليدخلوا سيرفرك ويحصلوا على نقاط!</p>
-                
-                <div class="link-box p-4 flex items-center justify-between gap-3">
-                    <code id="inviteLink" class="text-cyan-300 text-sm break-all">https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8</code>
-                    <button onclick="copyLink()" class="btn-primary px-3 py-2 rounded-lg text-sm">
+                <p class="text-gray-400">انسخ الرابط وأرسله لأصدقائك:</p>
+                <div class="link-box flex items-center justify-between gap-3">
+                    <code id="inviteLink" class="text-cyan-300 text-sm">https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8</code>
+                    <button onclick="copyInviteLink()" class="btn-primary px-3 py-2 rounded-lg text-sm">
                         <i class="fa fa-copy"></i>
                     </button>
                 </div>
-                
-                <a href="https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8" target="_blank" class="btn-success px-6 py-3 rounded-lg font-semibold w-full text-center block">
-                    <i class="fa fa-plus-circle ml-2"></i> اضغط هنا لإضافة البوت لسيرفرك
+                <a href="https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8" target="_blank" class="btn-success w-full py-3 rounded-lg font-semibold text-center block">
+                    <i class="fa fa-plus-circle ml-2"></i> أضف البوت لسيرفرك
                 </a>
-                
-                <div class="bg-slate-800/50 p-4 rounded-lg mt-4">
-                    <h4 class="font-semibold mb-2">💡 طريقة عمل نظام الدعوات:</h4>
-                    <ul class="text-sm text-gray-400 space-y-1">
-                        <li>• انسخ رابط الدعوة الخاص بك وأرسله لأصدقائك</li>
-                        <li>• لما يدخل صديقك من رابطك → تحصل على نقاط تلقائياً</li>
-                        <li>• كل دعوة ناجحة = <span class="text-cyan-400 font-bold">10 نقاط</span></li>
-                        <li>• تقدر تشتري من المتجر بالنقاط رتب ومزايا في السيرفر</li>
-                    </ul>
-                </div>
             </div>
         </div>
 
-        <!-- صفحة الترحيب -->
+        <!-- الترحيب -->
         <div id="welcome" class="page">
-            <h2 class="text-2xl font-bold mb-6">إعداد رسالة الترحيب</h2>
+            <h2 class="text-2xl font-bold mb-6">رسالة الترحيب 👋</h2>
             <div class="card p-6 space-y-4">
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">نص رسالة الترحيب</label>
-                    <textarea class="input-field w-full px-4 py-2 h-32" placeholder="أهلاً بك في السيرفر! 🎉">أهلاً بك في السيرفر! 🎉 انشط واحصل على نقاط من دعواتك!</textarea>
+                    <label class="block text-sm text-gray-400 mb-2">نص رسالة الترحيب:</label>
+                    <textarea id="welcomeMsg" class="input-field w-full px-4 py-3 h-32">أهلاً بك في السيرفر الجديد! 🎉 نتمنى لك وقتاً ممتعاً معنا.</textarea>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">رابط صورة الترحيب (اختياري)</label>
-                    <input type="text" class="input-field w-full px-4 py-2" placeholder="ألصق رابط الصورة هنا">
+                    <label class="block text-sm text-gray-400 mb-2">رابط صورة الترحيب (اختياري):</label>
+                    <input type="text" id="welcomeImg" class="input-field w-full px-4 py-3" placeholder="ألصق رابط الصورة هنا...">
                 </div>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" class="w-4 h-4" checked>
-                    <label class="text-sm">تفعيل رسالة الترحيب</label>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="welcomeOn" class="w-5 h-5" checked>
+                    <label for="welcomeOn">تفعيل رسالة الترحيب</label>
                 </div>
-                <button class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
+                <button onclick="saveWelcome()" class="btn-success w-full py-3 rounded-lg font-semibold">
+                    <i class="fa fa-save ml-2"></i> حفظ إعدادات الترحيب
+                </button>
+            </div>
+        </div>
+
+        <!-- التذاكر -->
+        <div id="tickets" class="page">
+            <h2 class="text-2xl font-bold mb-6">نظام التذاكر 🎫</h2>
+            <div class="card p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="ticketOn" class="w-5 h-5" checked>
+                    <label for="ticketOn">تفعيل نظام التذاكر</label>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">نص زر فتح التذكرة:</label>
+                    <input type="text" id="ticketText" class="input-field w-full px-4 py-3" value="📩 افتح تذكرة جديدة">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">معرف رتبة المشرفين:</label>
+                    <input type="text" id="modRoleId" class="input-field w-full px-4 py-3" placeholder="أدخل المعرف...">
+                </div>
+                <button onclick="saveTickets()" class="btn-success w-full py-3 rounded-lg font-semibold">
+                    <i class="fa fa-save ml-2"></i> حفظ إعدادات التذاكر
+                </button>
+            </div>
+        </div>
+
+        <!-- الحماية -->
+        <div id="security" class="page">
+            <h2 class="text-2xl font-bold mb-6">إعدادات الحماية 🛡️</h2>
+            <div class="card p-6 space-y-4">
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <span>حظر الروابط</span>
+                    <input type="checkbox" id="blockLinks" class="w-5 h-5">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <span>منع حذف القنوات</span>
+                    <input type="checkbox" id="protectChannels" class="w-5 h-5" checked>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <span>تنبيه عند دخول بوت</span>
+                    <input type="checkbox" id="botAlert" class="w-5 h-5" checked>
+                </div>
+                <button onclick="saveSecurity()" class="btn-success w-full py-3 rounded-lg font-semibold mt-4">
+                    <i class="fa fa-shield ml-2"></i> حفظ إعدادات الحماية
+                </button>
+            </div>
+        </div>
+
+        <!-- النقاط والمتجر -->
+        <div id="points" class="page">
+            <h2 class="text-2xl font-bold mb-6">النقاط والمتجر ⭐</h2>
+            <div class="card p-6 space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">عدد النقاط لكل دعوة:</label>
+                    <input type="number" id="pointsPerInvite" class="input-field w-full px-4 py-3" value="10">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">رسالة الحصول على نقاط:</label>
+                    <input type="text" id="pointsMsg" class="input-field w-full px-4 py-3" value="✅ حصلت على نقاط جديدة!">
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="pointsOn" class="w-5 h-5" checked>
+                    <label for="pointsOn">تفعيل نظام النقاط</label>
+                </div>
+                <button onclick="savePoints()" class="btn-success w-full py-3 rounded-lg font-semibold">
+                    <i class="fa fa-save ml-2"></i> حفظ إعدادات النقاط
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // تبديل الصفحات
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // رسالة تأكيد
+        function showToast() {
+            const t = document.getElementById('toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // نسخ الرابط
+        function copyInviteLink() {
+            const link = document.getElementById('inviteLink').innerText;
+            navigator.clipboard.writeText(link);
+            alert('✅ تم نسخ الرابط!');
+        }
+
+        // حفظ الترحيب
+        function saveWelcome() {
+            const data = {
+                message: document.getElementById('welcomeMsg').value,
+                image: document.getElementById('welcomeImg').value,
+                enabled: document.getElementById('welcomeOn').checked
+            };
+            localStorage.setItem('joker_welcome', JSON.stringify(data));
+            showToast();
+        }
+
+        // حفظ التذاكر
+        function saveTickets() {
+            const data = {
+                enabled: document.getElementById('ticketOn').checked,
+                buttonText: document.getElementById('ticketText').value,
+                modRole: document.getElementById('modRoleId').value
+            };
+            localStorage.setItem('joker_tickets', JSON.stringify(data));
+            showToast();
+        }
+
+        // حفظ الحماية
+        function saveSecurity() {
+            const data = {
+                blockLinks: document.getElementById('blockLinks').checked,
+                protectChannels: document.getElementById('protectChannels').checked,
+                botAlert: document.getElementById('botAlert').checked
+            };
+            localStorage.setItem('joker_security', JSON.stringify(data));
+            showToast();
+        }
+
+        // حفظ النقاط
+        function savePoints() {
+            const data = {
+                pointsPerInvite: document.getElementById('pointsPerInvite').value,
+                message: document.getElementById('pointsMsg').value,
+                enabled: document.getElementById('pointsOn').checked
+            };
+            localStorage.setItem('joker_points', JSON.stringify(data));
+            showToast();
+        }
+
+        // تحميل البيانات المحفوظة عند فتح الصفحة
+        window.onload = function() {
+            // تحميل إعدادات الترحيب
+            const welcome = localStorage.getItem('joker_welcome');
+            if (welcome) {
+                const w = JSON.parse(welcome);
+                document.getElementById('welcomeMsg').value = w.message || '';
+                document.getElementById('welcomeImg').value = w.image || '';
+                document.getElementById('welcomeOn').checked = w.enabled !== false;
+            }
+            // تحميل إعدادات التذاكر
+            const tickets = localStorage.getItem('joker_tickets');
+            if (tickets) {
+                const t = JSON.parse(tickets);
+                document.getElementById('ticketOn').checked = t.enabled !== false;
+                document.getElementById('ticketText').value = t.buttonText || '📩 افتح تذكرة جديدة';
+               
+n class="btn-primary px-6 py-2 rounded-lg font-semibold w-full">
                     <i class="fa fa-save ml-2"></i> حفظ إعدادات الترحيب
                 </button>
             </div>
