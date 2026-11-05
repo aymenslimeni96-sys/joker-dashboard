@@ -1,4 +1,5 @@
 
+
 ---
 1. ملف package.json:
 {
@@ -212,6 +213,116 @@ app.get('/guild/:id', need, access, (req, res) => {
   const msg = req.query.msg ? `<div class="msg">${esc(req.query.msg)}</div>` : '';
 
   res.send(page(`
+  <div class="header-bar">
+    <a href="/dashboard">← العودة لقائمة السيرفرات</a>
+    <h2 style="margin:0">${esc(guild.name)}</h2>
+  </div>
+  ${msg}
+
+  <form method="post" action="/guild/${guild.id}/save">
+    <div class="card">
+      <h3>👋 نظام الترحيب بالأعضاء</h3>
+      <label><input type="checkbox" name="wEnabled" ${cfg.welcome.enabled ? 'checked' : ''}> تفعيل رسائل الترحيب</label><br><br>
+      <label>قناة الترحيب</label><select name="wChannel">${opts(texts, cfg.welcome.channel)}</select>
+      <label>نص الرسالة (تستطيع استخدام {user} للإشارة للعضو و {count} لعدد الأعضاء)</label>
+      <textarea name="wMessage" rows="3">${esc(cfg.welcome.message)}</textarea>
+    </div>
+
+    <div class="card">
+      <h3>🎫 نظام تذاكر الدعم الفني (Tickets)</h3>
+      <label>قسم (Category) فتح التكتات</label><select name="tCategory">${opts(cats, cfg.ticket.category)}</select>
+      <label>رتبة الدعم الفني (المسؤولة عن رؤية التكتات)</label><select name="tRole">${opts(roles, cfg.ticket.role)}</select>
+    </div>
+    <button class="btn" type="submit">💾 حفظ كافة التعديلات</button>
+  </form>
+
+  <form class="card" method="post" action="/guild/${guild.id}/panel" style="margin-top:20px">
+    <h3>📨 إرسال لوحة تفاعلية لفتح التكتات</h3>
+    <label>اختر القناة لإرسال زر فتح التكت فيها</label><select name="channel">${opts(texts, '')}</select>
+    <button class="btn" type="submit" style="background:#1f6feb;margin-top:10px">إرسال زر التكت الآن</button>
+  </form>
+
+  <form class="card" method="post" action="/guild/${guild.id}/organize" style="margin-top:20px">
+    <h3>🗂️ الترتيب السريع للقنوات (قوالب جاهزة)</h3>
+    <label>اختر قالب السيرفر المناسب</label>
+    <select name="preset">
+      <option value="community">مجتمع عام (قوانين، دردشة، صوتيات)</option>
+      <option value="gaming">جيمنج وألعاب (ألعاب، رومستمات، صوت)</option>
+      <option value="support">دعم ومساعدة (تكتات، إعلانات، مجتمع)</option>
+    </select>
+    <button class="btn" type="submit" style="background:#8957e5;margin-top:10px">تطبيق القالب وإنشاء القنوات</button>
+  </form>`));
+});
+
+app.post('/guild/:id/save', need, access, (req, res) => {
+  const cfg = getCfg(req.params.id);
+  cfg.welcome = {
+    enabled: !!req.body.wEnabled, channel: req.body.wChannel || '',
+    message: (req.body.wMessage || '').slice(0, 1500),
+  };
+  cfg.ticket = { category: req.body.tCategory || '', role: req.body.tRole || '' };
+  saveDb();
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent('تم حفظ الإعدادات بنجاح ✅'));
+});
+
+app.post('/guild/:id/panel', need, access, async (req, res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  const ch = guild?.channels.cache.get(req.body.channel);
+  let m = 'الرجاء اختيار قناة صحيحة.';
+  if (ch) {
+    try {
+      const embed = new EmbedBuilder().setColor(0x2f3136).setTitle('🎫 تذاكر الدعم الفني')
+        .setDescription('لفتح تذكرة دعم جديدة، اضغط على الزر أدناه وسيتم فتح قناة خاصة لك.');
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('ticket_open').setLabel('📩 فتح تكت جديد').setStyle(ButtonStyle.Success));
+      await ch.send({ embeds: [embed], components: [row] });
+      m = 'تم إرسال زر التكت إلى القناة بنجاح ✅';
+    } catch { m = 'فشل الإرسال، تأكد أن البوت يملك صلاحيات كافية في القناة.'; }
+  }
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
+});
+
+const PRESETS = {
+  community: {
+    '📢 الأساسيات': ['القوانين', 'الإعلانات', 'الترحيب'],
+    '💬 الدردشة العامة': ['سوالف', 'الصور-والميديا', 'اقتراحات'],
+    '🔊 الرومات الصوتية': ['🔊 عام 1', '🔊 عام 2', '🎵 استماع'],
+  },
+  gaming: {
+    '🎮 الألعاب': ['الكل', 'البحث-عن-فريق', 'لقطات-الألعاب'],
+    '💬 الشات': ['دردشة-الألعاب', 'ميمز'],
+    '🔊 الصوت': ['🎮 فريق 1', '🎮 فريق 2'],
+  },
+  support: {
+    '📌 التوجيه': ['القوانين', 'الأسئلة-الشائعة'],
+    '🎫 الدعم': ['تذاكر-الدعم', 'شكاوى-واقتراحات'],
+    '💬 العام': ['دردشة-الاعضاء'],
+  },
+};
+
+app.post('/guild/:id/organize', need, access, async (req, res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  const preset = PRESETS[req.body.preset];
+  let m = 'قالب غير معروف.';
+  if (guild && preset) {
+    try {
+      for (const [cat, chans] of Object.entries(preset)) {
+        const parent = await guild.channels.create({ name: cat, type: ChannelType.GuildCategory });
+        for (const name of chans) {
+          const voice = name.startsWith('🔊') || name.startsWith('🎮');
+          await guild.channels.create({
+            name, parent: parent.id,
+            type: voice ? ChannelType.GuildVoice : ChannelType.GuildText,
+          });
+        }
+      }
+      m = 'تم تنظيم السيرفر وإنشاء القنوات بنجاح ✅';
+    } catch Manage Channels.'; }
+  }
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
+});
+
+app.listen(PORT, () => console.log(`[Dashboard] Server running on port ${PORT}`));(page(`
   <div class="header-bar">
     <a href="/dashboard">← العودة لقائمة السيرفرات</a>
     <h2 style="margin:0">${esc(guild.name)}</h2>
