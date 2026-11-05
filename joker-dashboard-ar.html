@@ -1,25 +1,5 @@
-
-
----
-1. ملف package.json:
-{
-  "name": "sakr-style-dashboard",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "discord.js": "^14.14.1",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-session": "^1.18.0"
-  }
-}
-
----
-2. ملف index.js:
-require('dotenv').config();
+dMTU2NTM5MzM2MzgyODc0NDMwMg.G1X3SS.rpNwAZX8YuyOXqS4itHie7cDo-CaCIHcougI5Upage(`
+  <div class="MTU2NTM5MzM2MzgyODc0NDMwMg.G1X3SS.rpNwAZX8Yrequire('dotenv').config();
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
@@ -43,7 +23,14 @@ const getCfg = (id) => (db[id] ||= {
 });
 
 /* ---------- البوت ---------- */
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
+});
 
 client.on('guildMemberAdd', async (member) => {
   const w = getCfg(member.guild.id).welcome;
@@ -54,7 +41,9 @@ client.on('guildMemberAdd', async (member) => {
     .replaceAll('{user}', `<@${member.id}>`)
     .replaceAll('{server}', member.guild.name)
     .replaceAll('{count}', member.guild.memberCount);
-  const embed = new EmbedBuilder().setColor(0x2f3136).setDescription(text)
+  const embed = new EmbedBuilder()
+    .setColor(0x2f3136)
+    .setDescription(text)
     .setThumbnail(member.user.displayAvatarURL());
   ch.send({ embeds: [embed] }).catch(() => {});
 });
@@ -64,8 +53,9 @@ client.on('interactionCreate', async (i) => {
   const cfg = getCfg(i.guild.id);
 
   if (i.customId === 'ticket_open') {
-    const exists = i.guild.channels.cache.find((c) => c.topic === `ticket:${i.user.id}`);
+    const exists = i.guild.channels.cache.find(c => c.topic === `ticket:${i.user.id}`);
     if (exists) return i.reply({ content: `لديك تكت مفتوح مسبقاً: ${exists}`, ephemeral: true });
+
     const view = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory];
     const overwrites = [
       { id: i.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
@@ -73,6 +63,7 @@ client.on('interactionCreate', async (i) => {
       { id: client.user.id, allow: [...view, PermissionFlagsBits.ManageChannels] },
     ];
     if (cfg.ticket.role) overwrites.push({ id: cfg.ticket.role, allow: view });
+
     try {
       const ch = await i.guild.channels.create({
         name: `ticket-${i.user.username}`.slice(0, 90),
@@ -82,16 +73,17 @@ client.on('interactionCreate', async (i) => {
         permissionOverwrites: overwrites,
       });
       const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('ticket_close').setLabel('🔒 إغلاق التكت').setStyle(ButtonStyle.Danger));
-      await ch.send({ content: `<@${i.user.id}> أهلاً بك! يرجى توضيح مشكلتك وسيرد عليك طاقم الدعم قريباً.`, components: [row] });
-      i.reply({ content: `تم فتح تكت جديد بنجاح: ${ch}`, ephemeral: true });
-    } catch (e) {
-      i.reply({ content: 'عذراً، لم أستطع فتح التكت. تأكد من صلاحيات البوت.', ephemeral: true });
+        new ButtonBuilder().setCustomId('ticket_close').setLabel('🔒 إغلاق التكت').setStyle(ButtonStyle.Danger)
+      );
+      await ch.send({ content: `<@${i.user.id}> أهلاً بك! وضح مشكلتك وسيرد عليك الدعم قريباً.`, components: [row] });
+      i.reply({ content: `تم فتح تكت جديد: ${ch}`, ephemeral: true });
+    } catch {
+      i.reply({ content: 'فشل فتح التكت. تأكد من صلاحيات البوت.', ephemeral: true });
     }
   }
 
   if (i.customId === 'ticket_close') {
-    await i.reply('⚠️ سيتم حذف تذكرة الدعم خلال 5 ثواني...');
+    await i.reply('⚠️ سيتم حذف التكت خلال 5 ثواني...');
     setTimeout(() => i.channel.delete().catch(() => {}), 5000);
   }
 });
@@ -104,340 +96,283 @@ const app = express();
 app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
-  secret: SESSION_SECRET || 'sakr-secret-key', resave: false, saveUninitialized: false,
+  secret: SESSION_SECRET || 'sakr-secret',
+  resave: false,
+  saveUninitialized: false,
   cookie: { secure: 'auto', sameSite: 'lax', maxAge: 7 * 24 * 3600 * 1000 },
 }));
 
-const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const esc = (s = '') => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
 const page = (body) => `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة إدارة السيرفرات</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة تحكم البوت</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Tahoma,sans-serif;background:#0d1117;color:#c9d1d9}
-.wrap{max-width:800px;margin:30px auto;padding:20px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin:15px 0;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
-h1,h2{color:#f0f6fc;margin-top:0}a{color:#58a6ff;text-decoration:none}
-.btn{display:inline-block;background:#238636;color:#fff;border:0;border-radius:6px;padding:10px 20px;font-size:15px;cursor:pointer;font-weight:bold;transition:0.2s}
-.btn:hover{opacity:0.9}.btn.gray{background:#21262d;border:1px solid #30363d;color:#c9d1d9}.btn.danger{background:#da3633}
-input[type=text],select,textarea{width:100%;padding:10px;margin:8px 0 15px;border-radius:6px;border:1px solid #30363d;background:#0d1117;color:#fff;font-size:14px}
+.wrap{max-width:900px;margin:30px auto;padding:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin:15px 0}
+h1,h2,h3{color:#f0f6fc;margin-top:0}a{color:#58a6ff;text-decoration:none}
+.btn{display:inline-block;background:#238636;color:#fff;border:0;border-radius:6px;padding:10px 18px;font-size:14px;cursor:pointer;font-weight:bold}
+.btn:hover{opacity:.9}.btn.gray{background:#21262d;border:1px solid #30363d;color:#c9d1d9}
+.btn.danger{background:#da3633}.btn.blue{background:#1f6feb}
+input,select,textarea{width:100%;padding:10px;margin:6px 0 12px;border-radius:6px;border:1px solid #30363d;background:#0d1117;color:#fff}
 label{font-size:13px;color:#8b949e;font-weight:bold}
-.srv{display:flex;align-items:center;gap:15px;justify-content:space-between}
-.srv img,.ph{width:50px;height:50px;border-radius:50%;background:#30363d}
-.msg{background:#1f6feb;color:#fff;padding:12px;border-radius:6px;margin-bottom:15px;font-weight:bold}
-.header-bar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #30363d;padding-bottom:15px;margin-bottom:20px}
+.srv{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.srv img,.ph{width:48px;height:48px;border-radius:50%;background:#30363d}
+.msg{background:#1f6feb;color:#fff;padding:12px;border-radius:6px;margin-bottom:15px}
+.header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #30363d;padding-bottom:12px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 </style></head><body><div class="wrap">${body}</div></body></html>`;
 
-const need = (req, res, next) => (req.session.user ? next() : res.redirect('/'));
-
-function access(req, res, next) {
-  const g = (req.session.guilds || []).find((x) => x.id === req.params.id);
-  if (!g) return res.status(403).send(page('<div class="card">عذراً، لا تمتلك صلاحيات الإدارة على هذا السيرفر.</div>'));
-  req.g = g;
-  next();
+const need = (req,res,next) => req.session.user ? next() : res.redirect('/');
+function access(req,res,next){
+  const g = (req.session.guilds||[]).find(x => x.id === req.params.id);
+  if(!g) return res.status(403).send(page('<div class="card">ليس لديك صلاحية على هذا السيرفر</div>'));
+  req.g = g; next();
 }
 
-const inviteUrl = (gid) =>
-  'https://discord.com/oauth2/authorize?' + new URLSearchParams({
-    client_id: CLIENT_ID, scope: 'bot applications.commands', permissions: '268520464',
-    guild_id: gid, disable_guild_select: 'true',
-  });
-
-app.get('/', (req, res) => {
-  if (req.session.user) return res.redirect('/dashboard');
-  res.send(page(`<div class="card" style="text-align:center;padding:40px">
-  <h1>🦅 نظام لوحة تحكم البوت</h1>
-  <p style="color:#8b949e;margin-bottom:25px">تحكم بكافة إعدادات سيرفرك، نظام الترحيب، والتكتات بكل سهولة.</p>
-  <a class="btn" href="/login" style="padding:12px 30px;font-size:16px">تسجيل الدخول بواسطة Discord</a></div>`));
+const inviteUrl = (gid) => 'https://discord.com/oauth2/authorize?' + new URLSearchParams({
+  client_id: CLIENT_ID, scope: 'bot applications.commands', permissions: '8',
+  guild_id: gid, disable_guild_select: 'true'
 });
 
-app.get('/login', (req, res) => res.redirect('https://discord.com/oauth2/authorize?' + new URLSearchParams({
-  client_id: CLIENT_ID, redirect_uri: REDIRECT, response_type: 'code', scope: 'identify guilds',
+app.get('/', (req,res) => {
+  if(req.session.user) return res.redirect('/dashboard');
+  res.send(page(`<div class="card" style="text-align:center;padding:40px">
+    <h1>🦅 لوحة تحكم البوت</h1>
+    <p style="color:#8b949e">ترحيب • تذاكر • إدارة قنوات • أعضاء</p>
+    <a class="btn" href="/login" style="padding:12px 28px;font-size:16px">تسجيل الدخول بواسطة Discord</a>
+  </div>`));
+});
+
+app.get('/login', (req,res) => res.redirect('https://discord.com/oauth2/authorize?' + new URLSearchParams({
+  client_id: CLIENT_ID, redirect_uri: REDIRECT, response_type: 'code', scope: 'identify guilds'
 })));
 
-app.get('/callback', async (req, res) => {
+app.get('/callback', async (req,res) => {
   try {
     const r = await fetch('https://discord.com/api/oauth2/token', {
-      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id: CLIENT_ID, client_secret: CLIENT_SECRET, grant_type: 'authorization_code',
-        code: req.query.code, redirect_uri: REDIRECT,
-      }),
+        client_id: CLIENT_ID, client_secret: CLIENT_SECRET,
+        grant_type: 'authorization_code', code: req.query.code, redirect_uri: REDIRECT
+      })
     });
     const t = await r.json();
-    if (!t.access_token) throw new Error('no token');
+    if(!t.access_token) throw new Error('no token');
     const h = { Authorization: `Bearer ${t.access_token}` };
     const user = await (await fetch('https://discord.com/api/users/@me', { headers: h })).json();
     const guilds = await (await fetch('https://discord.com/api/users/@me/guilds', { headers: h })).json();
     req.session.user = { id: user.id, username: user.username };
     req.session.guilds = guilds
-      .filter((g) => g.owner || (BigInt(g.permissions) & 0x28n))
-      .map((g) => ({ id: g.id, name: g.name, icon: g.icon }));
+      .filter(g => g.owner || (BigInt(g.permissions) & 0x8n))
+      .map(g => ({ id: g.id, name: g.name, icon: g.icon }));
     res.redirect('/dashboard');
-  } catch (e) {
-    res.status(500).send(page('<div class="card">فشل عملية تسجيل الدخول. <a href="/">العودة للرئيسية</a></div>'));
+  } catch {
+    res.status(500).send(page('<div class="card">فشل تسجيل الدخول</div>'));
   }
 });
 
-app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+app.get('/logout', (req,res) => req.session.destroy(() => res.redirect('/')));
 
-app.get('/dashboard', need, (req, res) => {
-  const list = req.session.guilds.map((g) => {
+app.get('/dashboard', need, (req,res) => {
+  const list = (req.session.guilds||[]).map(g => {
     const inGuild = client.guilds.cache.has(g.id);
     const icon = g.icon ? `<img src="https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64">` : '<div class="ph"></div>';
     const action = inGuild
-      ? `<a class="btn" href="/guild/${g.id}">إدارة السيرفر</a>`
+      ? `<a class="btn" href="/guild/${g.id}">إدارة</a>`
       : `<a class="btn gray" href="${esc(inviteUrl(g.id))}">دعوة البوت</a>`;
-    return `<div class="card srv"><div style="display:flex;gap:15px;align-items:center">${icon}<div><h3 style="margin:0">${esc(g.name)}</h3></div></div>${action}</div>`;
-  }).join('') || '<div class="card">لا توجد سيرفرات تملك صلاحية Manage Server فيها.</div>';
+    return `<div class="card srv"><div style="display:flex;gap:12px;align-items:center">${icon}<b>${esc(g.name)}</b></div>${action}</div>`;
+  }).join('') || '<div class="card">لا توجد سيرفرات لديك صلاحية فيها</div>';
 
   res.send(page(`
-    <div class="header-bar">
-      <h2>اختر السيرفر المراد إدارته</h2>
-      <a class="btn gray" href="/logout">تسجيل الخروج (${esc(req.session.user.username)})</a>
-    </div>
-    ${list}
-  `));
+    <div class="header">
+      <h2>اختر السيرفر</h2>
+      <a class="btn gray" href="/logout">خروج (${esc(req.session.user.username)})</a>
+    </div>${list}`));
 });
 
-const opts = (items, sel) =>
-  '<option value="">— اختر القناة/الرتبة —</option>' +
-  items.map((x) => `<option value="${x.id}" ${x.id === sel ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+const opts = (items, sel) => '<option value="">— اختر —</option>' +
+  items.map(x => `<option value="${x.id}" ${x.id===sel?'selected':''}>${esc(x.name)}</option>`).join('');
 
-app.get('/guild/:id', need, access, (req, res) => {
+app.get('/guild/:id', need, access, (req,res) => {
   const guild = client.guilds.cache.get(req.params.id);
-  if (!guild) return res.redirect(inviteUrl(req.params.id));
+  if(!guild) return res.redirect(inviteUrl(req.params.id));
   const cfg = getCfg(guild.id);
-  const texts = guild.channels.cache.filter((c) => c.type === ChannelType.GuildText).map((c) => ({ id: c.id, name: '#' + c.name }));
-  const cats = guild.channels.cache.filter((c) => c.type === ChannelType.GuildCategory).map((c) => ({ id: c.id, name: c.name }));
-  const roles = guild.roles.cache.filter((r) => r.id !== guild.id && !r.managed).map((r) => ({ id: r.id, name: r.name }));
+  const texts = guild.channels.cache.filter(c => c.type === ChannelType.GuildText).map(c => ({id:c.id, name:'#'+c.name}));
+  const cats  = guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory).map(c => ({id:c.id, name:c.name}));
+  const roles = guild.roles.cache.filter(r => r.id !== guild.id && !r.managed).map(r => ({id:r.id, name:r.name}));
   const msg = req.query.msg ? `<div class="msg">${esc(req.query.msg)}</div>` : '';
 
   res.send(page(`
-  <div class="header-bar">
-    <a href="/dashboard">← العودة لقائمة السيرفرات</a>
+  <div class="header">
+    <a href="/dashboard">← العودة</a>
     <h2 style="margin:0">${esc(guild.name)}</h2>
-  </div>
-  ${msg}
+  </div>${msg}
 
   <form method="post" action="/guild/${guild.id}/save">
     <div class="card">
-      <h3>👋 نظام الترحيب بالأعضاء</h3>
-      <label><input type="checkbox" name="wEnabled" ${cfg.welcome.enabled ? 'checked' : ''}> تفعيل رسائل الترحيب</label><br><br>
-      <label>قناة الترحيب</label><select name="wChannel">${opts(texts, cfg.welcome.channel)}</select>
-      <label>نص الرسالة (تستطيع استخدام {user} للإشارة للعضو و {count} لعدد الأعضاء)</label>
+      <h3>👋 نظام الترحيب</h3>
+      <label><input type="checkbox" name="wEnabled" ${cfg.welcome.enabled?'checked':''}> تفعيل الترحيب</label><br><br>
+      <label>قناة الترحيب</label>
+      <select name="wChannel">${opts(texts, cfg.welcome.channel)}</select>
+      <label>نص الرسالة ({user} {server} {count})</label>
       <textarea name="wMessage" rows="3">${esc(cfg.welcome.message)}</textarea>
     </div>
 
     <div class="card">
-      <h3>🎫 نظام تذاكر الدعم الفني (Tickets)</h3>
-      <label>قسم (Category) فتح التكتات</label><select name="tCategory">${opts(cats, cfg.ticket.category)}</select>
-      <label>رتبة الدعم الفني (المسؤولة عن رؤية التكتات)</label><select name="tRole">${opts(roles, cfg.ticket.role)}</select>
+      <h3>🎫 نظام التذاكر</h3>
+      <label>قسم التكتات</label>
+      <select name="tCategory">${opts(cats, cfg.ticket.category)}</select>
+      <label>رتبة الدعم</label>
+      <select name="tRole">${opts(roles, cfg.ticket.role)}</select>
     </div>
-    <button class="btn" type="submit">💾 حفظ كافة التعديلات</button>
+    <button class="btn" type="submit">💾 حفظ الإعدادات</button>
   </form>
 
-  <form class="card" method="post" action="/guild/${guild.id}/panel" style="margin-top:20px">
-    <h3>📨 إرسال لوحة تفاعلية لفتح التكتات</h3>
-    <label>اختر القناة لإرسال زر فتح التكت فيها</label><select name="channel">${opts(texts, '')}</select>
-    <button class="btn" type="submit" style="background:#1f6feb;margin-top:10px">إرسال زر التكت الآن</button>
+  <form class="card" method="post" action="/guild/${guild.id}/panel">
+    <h3>📨 إرسال زر فتح التكت</h3>
+    <select name="channel">${opts(texts,'')}</select>
+    <button class="btn blue" type="submit">إرسال الزر الآن</button>
   </form>
 
-  <form class="card" method="post" action="/guild/${guild.id}/organize" style="margin-top:20px">
-    <h3>🗂️ الترتيب السريع للقنوات (قوالب جاهزة)</h3>
-    <label>اختر قالب السيرفر المناسب</label>
-    <select name="preset">
-      <option value="community">مجتمع عام (قوانين، دردشة، صوتيات)</option>
-      <option value="gaming">جيمنج وألعاب (ألعاب، رومستمات، صوت)</option>
-      <option value="support">دعم ومساعدة (تكتات، إعلانات، مجتمع)</option>
-    </select>
-    <button class="btn" type="submit" style="background:#8957e5;margin-top:10px">تطبيق القالب وإنشاء القنوات</button>
-  </form>`));
-});
-
-app.post('/guild/:id/save', need, access, (req, res) => {
-  const cfg = getCfg(req.params.id);
-  cfg.welcome = {
-    enabled: !!req.body.wEnabled, channel: req.body.wChannel || '',
-    message: (req.body.wMessage || '').slice(0, 1500),
-  };
-  cfg.ticket = { category: req.body.tCategory || '', role: req.body.tRole || '' };
-  saveDb();
-  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent('تم حفظ الإعدادات بنجاح ✅'));
-});
-
-app.post('/guild/:id/panel', need, access, async (req, res) => {
-  const guild = client.guilds.cache.get(req.params.id);
-  const ch = guild?.channels.cache.get(req.body.channel);
-  let m = 'الرجاء اختيار قناة صحيحة.';
-  if (ch) {
-    try {
-      const embed = new EmbedBuilder().setColor(0x2f3136).setTitle('🎫 تذاكر الدعم الفني')
-        .setDescription('لفتح تذكرة دعم جديدة، اضغط على الزر أدناه وسيتم فتح قناة خاصة لك.');
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('ticket_open').setLabel('📩 فتح تكت جديد').setStyle(ButtonStyle.Success));
-      await ch.send({ embeds: [embed], components: [row] });
-      m = 'تم إرسال زر التكت إلى القناة بنجاح ✅';
-    } catch { m = 'فشل الإرسال، تأكد أن البوت يملك صلاحيات كافية في القناة.'; }
-  }
-  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
-});
-
-const PRESETS = {
-  community: {
-    '📢 الأساسيات': ['القوانين', 'الإعلانات', 'الترحيب'],
-    '💬 الدردشة العامة': ['سوالف', 'الصور-والميديا', 'اقتراحات'],
-    '🔊 الرومات الصوتية': ['🔊 عام 1', '🔊 عام 2', '🎵 استماع'],
-  },
-  gaming: {
-    '🎮 الألعاب': ['الكل', 'البحث-عن-فريق', 'لقطات-الألعاب'],
-    '💬 الشات': ['دردشة-الألعاب', 'ميمز'],
-    '🔊 الصوت': ['🎮 فريق 1', '🎮 فريق 2'],
-  },
-  support: {
-    '📌 التوجيه': ['القوانين', 'الأسئلة-الشائعة'],
-    '🎫 الدعم': ['تذاكر-الدعم', 'شكاوى-واقتراحات'],
-    '💬 العام': ['دردشة-الاعضاء'],
-  },
-};
-
-app.post('/guild/:id/organize', need, access, async (req, res) => {
-  const guild = client.guilds.cache.get(req.params.id);
-  const preset = PRESETS[req.body.preset];
-  let m = 'قالب غير معروف.';
-  if (guild && preset) {
-    try {
-      for (const [cat, chans] of Object.entries(preset)) {
-        const parent = await guild.channels.create({ name: cat, type: ChannelType.GuildCategory });
-        for (const name of chans) {
-          const voice = name.startsWith('🔊') || name.startsWith('🎮');
-          await guild.channels.create({
-            name, parent: parent.id,
-            type: voice ? ChannelType.GuildVoice : ChannelType.GuildText,
-          });
-        }
-      }
-      m = 'تم تنظيم السيرفر وإنشاء القنوات بنجاح ✅';
-    } catch Manage Channels.'; }
-  }
-  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
-});
-
-app.listen(PORT, () => console.log(`[Dashboard] Server running on port ${PORT}`));(page(`
-  <div class="header-bar">
-    <a href="/dashboard">← العودة لقائمة السيرفرات</a>
-    <h2 style="margin:0">${esc(guild.name)}</h2>
+  <div class="card">
+    <h3>📁 إنشاء قناة</h3>
+    <form method="post" action="/guild/${guild.id}/create-channel" class="grid">
+      <div>
+        <label>اسم القناة</label>
+        <input name="name" required placeholder="اسم-القناة">
+      </div>
+      <div>
+        <label>النوع</label>
+        <select name="type">
+          <option value="text">نصية</option>
+          <option value="voice">صوتية</option>
+          <option value="category">قسم</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1">
+        <button class="btn" type="submit">إنشاء القناة</button>
+      </div>
+    </form>
   </div>
-  ${msg}
 
-  <form method="post" action="/guild/${guild.id}/save">
-    <div class="card">
-      <h3>👋 نظام الترحيب بالأعضاء</h3>
-      <label><input type="checkbox" name="wEnabled" ${cfg.welcome.enabled ? 'checked' : ''}> تفعيل رسائل الترحيب</label><br><br>
-      <label>قناة الترحيب</label><select name="wChannel">${opts(texts, cfg.welcome.channel)}</select>
-      <label>نص الرسالة (تستطيع استخدام {user} للإشارة للعضو و {count} لعدد الأعضاء)</label>
-      <textarea name="wMessage" rows="3">${esc(cfg.welcome.message)}</textarea>
-    </div>
+  <div class="card">
+    <h3>🗑️ حذف قناة</h3>
+    <form method="post" action="/guild/${guild.id}/delete-channel">
+      <select name="channel" required>${opts(texts.concat(cats),'')}</select>
+      <button class="btn danger" type="submit">حذف القناة</button>
+    </form>
+  </div>
 
-    <div class="card">
-      <h3>🎫 نظام تذاكر الدعم الفني (Tickets)</h3>
-      <label>قسم (Category) فتح التكتات</label><select name="tCategory">${opts(cats, cfg.ticket.category)}</select>
-      <label>رتبة الدعم الفني (المسؤولة عن رؤية التكتات)</label><select name="tRole">${opts(roles, cfg.ticket.role)}</select>
-    </div>
-    <button class="btn" type="submit">💾 حفظ كافة التعديلات</button>
-  </form>
-
-  <form class="card" method="post" action="/guild/${guild.id}/panel" style="margin-top:20px">
-    <h3>📨 إرسال لوحة تفاعلية لفتح التكتات</h3>
-    <label>اختر القناة لإرسال زر فتح التكت فيها</label><select name="channel">${opts(texts, '')}</select>
-    <button class="btn" type="submit" style="background:#1f6feb;margin-top:10px">إرسال زر التكت الآن</button>
-  </form>
-
-  <form class="card" method="post" action="/guild/${guild.id}/organize" style="margin-top:20px">
-    <h3>🗂️ الترتيب السريع للقنوات (قوالب جاهزة)</h3>
-    <label>اختر قالب السيرفر المناسب</label>
-    <select name="preset">
-      <option value="community">مجتمع عام (قوانين، دردشة، صوتيات)</option>
-      <option value="gaming">جيمنج وألعاب (ألعاب، رومستمات، صوت)</option>
-      <option value="support">دعم ومساعدة (تكتات، إعلانات، مجتمع)</option>
-    </select>
-    <button class="btn" type="submit" style="background:#8957e5;margin-top:10px">تطبيق القالب وإنشاء القنوات</button>
-  </form>`));
+  <div class="card">
+    <h3>👤 تعديل عضو (طرد / باند)</h3>
+    <form method="post" action="/guild/${guild.id}/member-action" class="grid">
+      <div>
+        <label>آيدي العضو</label>
+        <input name="memberId" required placeholder="123456789">
+      </div>
+      <div>
+        <label>الإجراء</label>
+        <select name="action">
+          <option value="kick">طرد</option>
+          <option value="ban">باند</option>
+          <option value="unban">فك باند</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1">
+        <label>السبب (اختياري)</label>
+        <input name="reason" placeholder="سبب الإجراء">
+        <button class="btn danger" type="submit">تنفيذ</button>
+      </div>
+    </form>
+  </div>
+  `));
 });
 
-app.post('/guild/:id/save', need, access, (req, res) => {
+app.post('/guild/:id/save', need, access, (req,res) => {
   const cfg = getCfg(req.params.id);
   cfg.welcome = {
-    enabled: !!req.body.wEnabled, channel: req.body.wChannel || '',
-    message: (req.body.wMessage || '').slice(0, 1500),
+    enabled: !!req.body.wEnabled,
+    channel: req.body.wChannel || '',
+    message: (req.body.wMessage || '').slice(0,1500)
   };
-  cfg.ticket = { category: req.body.tCategory || '', role: req.body.tRole || '' };
+  cfg.ticket = {
+    category: req.body.tCategory || '',
+    role: req.body.tRole || ''
+  };
   saveDb();
-  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent('تم حفظ الإعدادات بنجاح ✅'));
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent('تم الحفظ بنجاح ✅'));
 });
 
-app.post('/guild/:id/panel', need, access, async (req, res) => {
+app.post('/guild/:id/panel', need, access, async (req,res) => {
   const guild = client.guilds.cache.get(req.params.id);
   const ch = guild?.channels.cache.get(req.body.channel);
-  let m = 'الرجاء اختيار قناة صحيحة.';
-  if (ch) {
+  let m = 'اختر قناة صحيحة';
+  if(ch){
     try {
-      const embed = new EmbedBuilder().setColor(0x2f3136).setTitle('🎫 تذاكر الدعم الفني')
-        .setDescription('لفتح تذكرة دعم جديدة، اضغط على الزر أدناه وسيتم فتح قناة خاصة لك.');
+      const embed = new EmbedBuilder().setColor(0x2f3136).setTitle('🎫 تذاكر الدعم')
+        .setDescription('اضغط الزر لفتح تذكرة خاصة بك');
       const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('ticket_open').setLabel('📩 فتح تكت جديد').setStyle(ButtonStyle.Success));
-      await ch.send({ embeds: [embed], components: [row] });
-      m = 'تم إرسال زر التكت إلى القناة بنجاح ✅';
-    } catch { m = 'فشل الإرسال، تأكد أن البوت يملك صلاحيات كافية في القناة.'; }
+        new ButtonBuilder().setCustomId('ticket_open').setLabel('📩 فتح تكت').setStyle(ButtonStyle.Success)
+      );
+      await ch.send({ embeds:[embed], components:[row] });
+      m = 'تم إرسال زر التكت ✅';
+    } catch { m = 'فشل الإرسال - تأكد من صلاحيات البوت'; }
   }
   res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
 });
 
-const PRESETS = {
-  community: {
-    '📢 الأساسيات': ['القوانين', 'الإعلانات', 'الترحيب'],
-    '💬 الدردشة العامة': ['سوالف', 'الصور-والميديا', 'اقتراحات'],
-    '🔊 الرومات الصوتية': ['🔊 عام 1', '🔊 عام 2', '🎵 استماع'],
-  },
-  gaming: {
-    '🎮 الألعاب': ['الكل', 'البحث-عن-فريق', 'لقطات-الألعاب'],
-    '💬 الشات': ['دردشة-الألعاب', 'ميمز'],
-    '🔊 الصوت': ['🎮 فريق 1', '🎮 فريق 2'],
-  },
-  support: {
-    '📌 التوجيه': ['القوانين', 'الأسئلة-الشائعة'],
-    '🎫 الدعم': ['تذاكر-الدعم', 'شكاوى-واقتراحات'],
-    '💬 العام': ['دردشة-الاعضاء'],
-  },
-};
-
-app.post('/guild/:id/organize', need, access, async (req, res) => {
+app.post('/guild/:id/create-channel', need, access, async (req,res) => {
   const guild = client.guilds.cache.get(req.params.id);
-  const preset = PRESETS[req.body.preset];
-  let m = 'قالب غير معروف.';
-  if (guild && preset) {
+  let m = 'فشل الإنشاء';
+  if(guild){
     try {
-      for (const [cat, chans] of Object.entries(preset)) {
-        const parent = await guild.channels.create({ name: cat, type: ChannelType.GuildCategory });
-        for (const name of chans) {
-          const voice = name.startsWith('🔊') || name.startsWith('🎮');
-          await guild.channels.create({
-            name, parent: parent.id,
-            type: voice ? ChannelType.GuildVoice : ChannelType.GuildText,
-          });
-        }
-      }
-      m = 'تم تنظيم السيرفر وإنشاء القنوات بنجاح ✅';
-    } catch { m = 'فشل تنظيم السيرفر. تأكد أن البوت يملك صلاحية Manage Channels.'; }
+      const type = req.body.type === 'voice' ? ChannelType.GuildVoice :
+                   req.body.type === 'category' ? ChannelType.GuildCategory : ChannelType.GuildText;
+      await guild.channels.create({ name: req.body.name.slice(0,100), type });
+      m = 'تم إنشاء القناة بنجاح ✅';
+    } catch { m = 'فشل - تأكد أن البوت يملك Manage Channels'; }
   }
   res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
 });
 
-app.listen(PORT, () => console.log(`[Dashboard] Server running on port ${PORT}`));tton class="btn green" type="submit">إرسال</button>
-  </form>
+app.post('/guild/:id/delete-channel', need, access, async (req,res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  const ch = guild?.channels.cache.get(req.body.channel);
+  let m = 'فشل الحذف';
+  if(ch){
+    try {
+      await ch.delete();
+      m = 'تم حذف القناة ✅';
+    } catch { m = 'فشل - تأكد من الصلاحيات'; }
+  }
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
+});
 
-  <form class="card" method="post" action="/guild/${guild.id}/organize">
-    <h2>🗂️ تنظيم القنوات</h2>
-    <p style="color:#b5bac1">ينشئ كاتيجوريات وقنوات جاهزة (ما يحذف شي موجود).</p>
+app.post('/guild/:id/member-action', need, access, async (req,res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  let m = 'فشل الإجراء';
+  if(guild){
+    try {
+      const reason = req.body.reason || 'من لوحة التحكم';
+      if(req.body.action === 'kick'){
+        const member = await guild.members.fetch(req.body.memberId);
+        await member.kick(reason);
+        m = 'تم طرد العضو ✅';
+      } else if(req.body.action === 'ban'){
+        await guild.members.ban(req.body.memberId, { reason });
+        m = 'تم حظر العضو ✅';
+      } else if(req.body.action === 'unban'){
+        await guild.members.unban(req.body.memberId, reason);
+        m = 'تم فك الحظر ✅';
+      }
+    } catch(e){ m = 'فشل - تأكد من الآيدي والصلاحيات'; }
+  }
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
+});
+
+app.listen(PORT, () => console.log(`[Dashboard] http://localhost:${PORT}`));ي موجود).</p>
     <label>القالب</label>
     <select name="preset">
       <option value="community">مجتمع عام (معلومات، دردشة، صوتيات)</option>
