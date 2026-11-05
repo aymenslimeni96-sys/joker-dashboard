@@ -1,154 +1,292 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم JOKER 🃏</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
-        * { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --bg-dark: #0f172a; --bg-card: #1e293b; --primary: #00bfff; --success: #10b981; --danger: #ef4444; --text: #f8fafc; }
-        body { background-color: var(--bg-dark); color: var(--text); min-height: 100vh; }
-        .sidebar-item { transition: all 0.3s ease; border-right: 3px solid transparent; cursor: pointer; }
-        .sidebar-item:hover, .sidebar-item.active { background: linear-gradient(90deg, rgba(0,191,255,0.15), transparent); border-right-color: var(--primary); color: var(--primary) !important; }
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background-color: var(--bg-card); border-radius: 12px; border: 1px solid rgba(0,191,255,0.1); }
-        .btn-primary { background: linear-gradient(135deg, #00bfff, #0080ff); transition: all 0.3s ease; border: none; cursor: pointer; border-radius: 8px; font-weight: 600; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,191,255,0.3); }
-        .btn-success { background: linear-gradient(135deg, #10b981, #059669); transition: all 0.3s ease; border: none; cursor: pointer; border-radius: 8px; font-weight: 600; }
-        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(16,185,129,0.3); }
-        .input-field { background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 8px; padding: 10px 14px; width: 100%; }
-        .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,191,255,0.2); }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 14px 28px; border-radius: 10px; z-index: 9999; opacity: 0; transition: all 0.4s ease; box-shadow: 0 4px 20px rgba(16,185,129,0.3); font-weight: 600; }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .link-box { background: rgba(0,191,255,0.08); border: 1px dashed #00bfff; border-radius: 8px; padding: 14px; word-break: break-all; font-size: 0.85rem; color: #93c5fd; }
-        .toggle-switch { position: relative; width: 48px; height: 26px; background: #374151; border-radius: 13px; cursor: pointer; transition: all 0.3s ease; }
-        .toggle-switch.on { background: #10b981; }
-        .toggle-switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: all 0.3s ease; }
-        .toggle-switch.on::after { right: 25px; }
-        .status-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .stat-card { background: linear-gradient(135deg, rgba(0,191,255,0.1), rgba(168,85,247,0.05)); border: 1px solid rgba(0,191,255,0.2); border-radius: 12px; padding: 20px; text-align: center; }
-        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); }
-        .stat-label { font-size: 13px; color: #94a3b8; margin-top: 4px; }
-    </style>
-</head>
-<body class="flex">
-    <!-- رسالة الحفظ -->
-    <div id="toast" class="toast">✅ تم حفظ الإعدادات بنجاح!</div>
+require('dotenv').config();
+const fs = require('fs');
+const express = require('express');
+const session = require('express-session');
+const {
+  Client, GatewayIntentBits, PermissionFlagsBits, ChannelType,
+  EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle,
+} = require('discord.js');
 
-    <!-- الشريط الجانبي -->
-    <aside class="w-64 min-h-screen bg-slate-900/50 border-l border-cyan-500/10 p-4 fixed right-0 top-0 bottom-0 z-10">
-        <div class="text-center mb-8 pt-4">
-            <h1 class="text-2xl font-bold text-cyan-400">🃏 JOKER</h1>
-            <p class="text-sm text-gray-400 mt-1">لوحة تحكم البوت</p>
-            <div class="mt-3 status-indicator text-green-400 justify-center">
-                <span class="status-dot"></span>
-                جاهز للعمل
-            </div>
-        </div>
-        <nav class="space-y-2">
-            <div class="sidebar-item active block py-3 px-4 rounded-l-lg text-gray-300" onclick="showPage('home')">
-                <i class="fa fa-home ml-2"></i> الرئيسية
-            </div>
-            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('invite')">
-                <i class="fa fa-link ml-2"></i> رابط الدعوة
-            </div>
-            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('welcome')">
-                <i class="fa fa-hand-paper-o ml-2"></i> الترحيب
-            </div>
-            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('tickets')">
-                <i class="fa fa-ticket ml-2"></i> التذاكر
-            </div>
-            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('security')">
-                <i class="fa fa-shield ml-2"></i> الحماية
-            </div>
-            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('points')">
-                <i class="fa fa-star ml-2"></i> النقاط والمتجر
-            </div>
-            <div class="sidebar-item block py-3 px-4 rounded-l-lg text-gray-400" onclick="showPage('export')">
-                <i class="fa fa-download ml-2"></i> تصدير الإعدادات
-            </div>
-        </nav>
-    </aside>
+const { BOT_TOKEN, CLIENT_ID, CLIENT_SECRET, BASE_URL, SESSION_SECRET } = process.env;
+const REDIRECT = `${BASE_URL}/callback`;
+const PORT = process.env.PORT || 3000;
 
-    <!-- المحتوى الرئيسي -->
-    <main class="mr-64 flex-1 p-6">
-        <!-- الصفحة الرئيسية -->
-        <div id="home" class="page active">
-            <h2 class="text-2xl font-bold mb-6">مرحباً بك في لوحة تحكم JOKER 🃏</h2>
-            <p class="text-gray-400 mb-8">تحكم بجميع إعدادات بوتك بسهولة وأمان. كل تغييراتك محفوظة تلقائياً ✅</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-members">--</div>
-                    <div class="stat-label">أعضاء السيرفر</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-invites">0</div>
-                    <div class="stat-label">الدعوات الناجحة</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-points">0</div>
-                    <div class="stat-label">نقاط موزعة</div>
-                </div>
-            </div>
+/* ---------- قاعدة بيانات بسيطة ---------- */
+const DB_FILE = './data.json';
+let db = {};
+try { db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch {}
+const saveDb = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+const getCfg = (id) => (db[id] ||= {
+  welcome: { enabled: false, channel: '', message: 'أهلاً {user} في {server}! أنت العضو رقم {count} 🎉' },
+  ticket: { category: '', role: '' },
+});
 
-            <div class="card p-6 mb-6">
-                <h3 class="text-lg font-semibold mb-4">ℹ️ معلومات البوت</h3>
-                <div class="space-y-2 text-gray-300">
-                    <p><strong>اسم البوت:</strong> JOKER 🃏</p>
-                    <p><strong>معرف العميل:</strong> <span class="text-cyan-400">1565393363828744302</span></p>
-                    <p><strong>حالة الاتصال:</strong> <span class="text-green-400">جاهز للإضافة</span></p>
-                </div>
-            </div>
+/* ---------- البوت ---------- */
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
-            <div class="card p-6 bg-slate-800/50 border-l-4 border-cyan-500">
-                <h4 class="font-semibold text-cyan-300 mb-2">💡 الخطوات الكاملة للتشغيل:</h4>
-                <ol class="text-sm text-gray-300 space-y-1 list-decimal list-inside">
-                    <li>اذهب لصفحة <strong>رابط الدعوة</strong> وأضف البوت لسيرفرك</li>
-                    <li>أكمل إعدادات كل صفحة واضغط <strong>حفظ</strong></li>
-                    <li>اذهب لصفحة <strong>تصدير الإعدادات</strong> واحفظ ملف الإعدادات</li>
-                    <li>ضع الملف مع ملفات البوت وسوف يقرأها البوت تلقائياً عند التشغيل</li>
-                </ol>
-            </div>
-        </div>
+client.on('guildMemberAdd', async (member) => {
+  const w = getCfg(member.guild.id).welcome;
+  if (!w.enabled || !w.channel) return;
+  const ch = member.guild.channels.cache.get(w.channel);
+  if (!ch) return;
+  const text = w.message
+    .replaceAll('{user}', `<@${member.id}>`)
+    .replaceAll('{server}', member.guild.name)
+    .replaceAll('{count}', member.guild.memberCount);
+  const embed = new EmbedBuilder().setColor(0x5865f2).setDescription(text)
+    .setThumbnail(member.user.displayAvatarURL());
+  ch.send({ embeds: [embed] }).catch(() => {});
+});
 
-        <!-- رابط الدعوة -->
-        <div id="invite" class="page">
-            <h2 class="text-2xl font-bold mb-6">رابط دعوة البوت 🚀</h2>
-            <div class="card p-6 space-y-4">
-                <p class="text-gray-400">انسخ الرابط أدناه وأرسله لأصدقائك ليدخلوا سيرفرك:</p>
-                
-                <div class="link-box flex items-center justify-between gap-3">
-                    <code id="inviteLink" class="text-cyan-300 text-sm break-all">https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8</code>
-                    <button onclick="copyText('inviteLink')" class="btn-primary px-3 py-2 text-sm">
-                        <i class="fa fa-copy"></i>
-                    </button>
-                </div>
+client.on('interactionCreate', async (i) => {
+  if (!i.isButton()) return;
+  const cfg = getCfg(i.guild.id);
 
-                <a href="https://discord.com/oauth2/authorize?client_id=1565393363828744302&scope=bot&permissions=8" target="_blank" class="btn-success w-full py-3 text-center block">
-                    <i class="fa fa-plus-circle ml-2"></i> افتح صفحة الإضافة
-                </a>
-            </div>
-        </div>
+  if (i.customId === 'ticket_open') {
+    const exists = i.guild.channels.cache.find((c) => c.topic === `ticket:${i.user.id}`);
+    if (exists) return i.reply({ content: `عندك تكت مفتوح: ${exists}`, ephemeral: true });
+    const view = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory];
+    const overwrites = [
+      { id: i.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
+      { id: i.user.id, allow: view },
+      { id: client.user.id, allow: [...view, PermissionFlagsBits.ManageChannels] },
+    ];
+    if (cfg.ticket.role) overwrites.push({ id: cfg.ticket.role, allow: view });
+    try {
+      const ch = await i.guild.channels.create({
+        name: `ticket-${i.user.username}`.slice(0, 90),
+        type: ChannelType.GuildText,
+        parent: cfg.ticket.category || null,
+        topic: `ticket:${i.user.id}`,
+        permissionOverwrites: overwrites,
+      });
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('ticket_close').setLabel('إغلاق التكت').setStyle(ButtonStyle.Danger));
+      await ch.send({ content: `<@${i.user.id}> أهلاً! اكتب مشكلتك وسيرد عليك الفريق.`, components: [row] });
+      i.reply({ content: `تم فتح التكت: ${ch}`, ephemeral: true });
+    } catch (e) {
+      i.reply({ content: 'ما قدرت أفتح التكت. تأكد من صلاحيات البوت.', ephemeral: true });
+    }
+  }
 
-        <!-- الترحيب -->
-        <div id="welcome" class="page">
-            <h2 class="text-2xl font-bold mb-6">إعداد رسالة الترحيب 👋</h2>
-            <div class="card p-6 space-y-4">
-                <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                    <span>تفعيل رسالة الترحيب</span>
-                    <div id="welcome-enabled" class="toggle-switch on" onclick="toggleSwitch(this)"></div>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">نص رسالة الترحيب:</label>
-                    <textarea id="welcome-message" class="input-field h-32">أهلاً بك في سيرفر JOKER! 🎉 نتمنى لك وقتاً ممتعاً معنا. شارك أصدقائك واحصل على نقاط إضافية! ⭐</textarea>
+  if (i.customId === 'ticket_close') {
+    await i.reply('سيتم حذف القناة بعد 5 ثواني...');
+    setTimeout(() => i.channel.delete().catch(() => {}), 5000);
+  }
+});
+
+client.once('ready', () => console.log(`Bot ready: ${client.user.tag}`));
+client.login(BOT_TOKEN);
+
+/* ---------- اللوحة ---------- */
+const app = express();
+app.set('trust proxy', 1);
+app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  secret: SESSION_SECRET || 'change-me', resave: false, saveUninitialized: false,
+  cookie: { secure: 'auto', sameSite: 'lax', maxAge: 7 * 24 * 3600 * 1000 },
+}));
+
+const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const page = (body) => `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة التحكم</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#1e1f22;color:#f2f3f5}
+.wrap{max-width:720px;margin:auto;padding:16px}
+.card{background:#2b2d31;border-radius:12px;padding:16px;margin:12px 0}
+h1,h2{margin:0 0 12px}a{color:#8ea1ff;text-decoration:none}
+.btn{display:inline-block;background:#5865f2;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:15px;cursor:pointer}
+.btn.green{background:#248046}.btn.gray{background:#4e5058}
+input[type=text],select,textarea{width:100%;padding:10px;margin:6px 0 12px;border-radius:8px;border:1px solid #3f4147;background:#1e1f22;color:#fff;font-size:15px}
+label{font-size:14px;color:#b5bac1}
+.srv{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.srv img,.ph{width:44px;height:44px;border-radius:50%;background:#4e5058}
+.msg{background:#248046;padding:10px;border-radius:8px}
+</style></head><body><div class="wrap">${body}</div></body></html>`;
+
+const need = (req, res, next) => (req.session.user ? next() : res.redirect('/'));
+
+function access(req, res, next) {
+  const g = (req.session.guilds || []).find((x) => x.id === req.params.id);
+  if (!g) return res.status(403).send(page('<div class="card">ما عندك صلاحية على هذا السيرفر.</div>'));
+  req.g = g;
+  next();
+}
+
+const inviteUrl = (gid) =>
+  'https://discord.com/oauth2/authorize?' + new URLSearchParams({
+    client_id: CLIENT_ID, scope: 'bot applications.commands', permissions: '268520464',
+    guild_id: gid, disable_guild_select: 'true',
+  });
+
+app.get('/', (req, res) => {
+  if (req.session.user) return res.redirect('/dashboard');
+  res.send(page(`<div class="card"><h1>🤖 لوحة تحكم البوت</h1>
+  <p>سجّل الدخول لإدارة سيرفراتك.</p><a class="btn" href="/login">تسجيل الدخول بـ Discord</a></div>`));
+});
+
+app.get('/login', (req, res) => res.redirect('https://discord.com/oauth2/authorize?' + new URLSearchParams({
+  client_id: CLIENT_ID, redirect_uri: REDIRECT, response_type: 'code', scope: 'identify guilds',
+})));
+
+app.get('/callback', async (req, res) => {
+  try {
+    const r = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: CLIENT_ID, client_secret: CLIENT_SECRET, grant_type: 'authorization_code',
+        code: req.query.code, redirect_uri: REDIRECT,
+      }),
+    });
+    const t = await r.json();
+    if (!t.access_token) throw new Error('no token');
+    const h = { Authorization: `Bearer ${t.access_token}` };
+    const user = await (await fetch('https://discord.com/api/users/@me', { headers: h })).json();
+    const guilds = await (await fetch('https://discord.com/api/users/@me/guilds', { headers: h })).json();
+    req.session.user = { id: user.id, username: user.username };
+    req.session.guilds = guilds
+      .filter((g) => g.owner || (BigInt(g.permissions) & 0x28n))
+      .map((g) => ({ id: g.id, name: g.name, icon: g.icon }));
+    res.redirect('/dashboard');
+  } catch (e) {
+    res.status(500).send(page('<div class="card">فشل تسجيل الدخول. <a href="/">حاول مرة ثانية</a></div>'));
+  }
+});
+
+app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
+
+app.get('/dashboard', need, (req, res) => {
+  const list = req.session.guilds.map((g) => {
+    const inGuild = client.guilds.cache.has(g.id);
+    const icon = g.icon ? `<img src="https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64">` : '<div class="ph"></div>';
+    const action = inGuild
+      ? `<a class="btn green" href="/guild/${g.id}">إدارة</a>`
+      : `<a class="btn gray" href="${esc(inviteUrl(g.id))}">دعوة البوت</a>`;
+    return `<div class="card srv"><div style="display:flex;gap:12px;align-items:center">${icon}<b>${esc(g.name)}</b></div>${action}</div>`;
+  }).join('') || '<div class="card">ما عندك سيرفرات تملك فيها صلاحية Manage Server.</div>';
+  res.send(page(`<h1>اختر سيرفر</h1>${list}<p><a href="/logout">تسجيل الخروج (${esc(req.session.user.username)})</a></p>`));
+});
+
+const opts = (items, sel) =>
+  '<option value="">— بدون —</option>' +
+  items.map((x) => `<option value="${x.id}" ${x.id === sel ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+
+app.get('/guild/:id', need, access, (req, res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  if (!guild) return res.redirect(inviteUrl(req.params.id));
+  const cfg = getCfg(guild.id);
+  const texts = guild.channels.cache.filter((c) => c.type === ChannelType.GuildText).map((c) => ({ id: c.id, name: '#' + c.name }));
+  const cats = guild.channels.cache.filter((c) => c.type === ChannelType.GuildCategory).map((c) => ({ id: c.id, name: c.name }));
+  const roles = guild.roles.cache.filter((r) => r.id !== guild.id && !r.managed).map((r) => ({ id: r.id, name: r.name }));
+  const msg = req.query.msg ? `<div class="msg">${esc(req.query.msg)}</div>` : '';
+
+  res.send(page(`
+  <p><a href="/dashboard">← السيرفرات</a></p><h1>${esc(guild.name)}</h1>${msg}
+
+  <form method="post" action="/guild/${guild.id}/save">
+    <div class="card"><h2>👋 الترحيب</h2>
+      <label><input type="checkbox" name="wEnabled" ${cfg.welcome.enabled ? 'checked' : ''}> تفعيل الترحيب</label><br><br>
+      <label>قناة الترحيب</label><select name="wChannel">${opts(texts, cfg.welcome.channel)}</select>
+      <label>الرسالة ({user} {server} {count})</label>
+      <textarea name="wMessage" rows="3">${esc(cfg.welcome.message)}</textarea>
+    </div>
+    <div class="card"><h2>🎫 إعدادات التكت</h2>
+      <label>كاتيجوري التكتات</label><select name="tCategory">${opts(cats, cfg.ticket.category)}</select>
+      <label>رتبة الدعم (ترى التكتات)</label><select name="tRole">${opts(roles, cfg.ticket.role)}</select>
+    </div>
+    <button class="btn" type="submit">💾 حفظ</button>
+  </form>
+
+  <form class="card" method="post" action="/guild/${guild.id}/panel">
+    <h2>📨 إرسال لوحة التكت</h2>
+    <label>القناة اللي ينرسل فيها زر فتح التكت</label><select name="channel">${opts(texts, '')}</select>
+    <button class="btn green" type="submit">إرسال</button>
+  </form>
+
+  <form class="card" method="post" action="/guild/${guild.id}/organize">
+    <h2>🗂️ تنظيم القنوات</h2>
+    <p style="color:#b5bac1">ينشئ كاتيجوريات وقنوات جاهزة (ما يحذف شي موجود).</p>
+    <label>القالب</label>
+    <select name="preset">
+      <option value="community">مجتمع عام (معلومات، دردشة، صوتيات)</option>
+      <option value="gaming">قيمنق (عام، ألعاب، صوتيات)</option>
+      <option value="support">دعم فني (معلومات، دعم، مجتمع)</option>
+    </select>
+    <button class="btn green" type="submit">إنشاء</button>
+  </form>`));
+});
+
+app.post('/guild/:id/save', need, access, (req, res) => {
+  const cfg = getCfg(req.params.id);
+  cfg.welcome = {
+    enabled: !!req.body.wEnabled, channel: req.body.wChannel || '',
+    message: (req.body.wMessage || '').slice(0, 1500),
+  };
+  cfg.ticket = { category: req.body.tCategory || '', role: req.body.tRole || '' };
+  saveDb();
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent('تم الحفظ ✅'));
+});
+
+app.post('/guild/:id/panel', need, access, async (req, res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  const ch = guild?.channels.cache.get(req.body.channel);
+  let m = 'اختر قناة أول.';
+  if (ch) {
+    try {
+      const embed = new EmbedBuilder().setColor(0x5865f2).setTitle('🎫 الدعم')
+        .setDescription('اضغط على الزر لفتح تكت.');
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('ticket_open').setLabel('فتح تكت').setStyle(ButtonStyle.Primary));
+      await ch.send({ embeds: [embed], components: [row] });
+      m = 'تم إرسال لوحة التكت ✅';
+    } catch { m = 'فشل الإرسال. تأكد من صلاحيات البوت في القناة.'; }
+  }
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
+});
+
+const PRESETS = {
+  community: {
+    '📢 معلومات': ['القوانين', 'الإعلانات', 'الترحيب'],
+    '💬 الدردشة': ['عام', 'ميديا', 'اقتراحات'],
+    '🔊 الصوتيات': ['🔊 عام 1', '🔊 عام 2', '🎵 موسيقى'],
+  },
+  gaming: {
+    '📢 معلومات': ['القوانين', 'الإعلانات'],
+    '💬 عام': ['دردشة', 'ميمز'],
+    '🎮 الألعاب': ['البحث-عن-فريق', 'نقاش-الألعاب', 'كليبات'],
+    '🔊 الصوتيات': ['🎮 فريق 1', '🎮 فريق 2', '🎵 موسيقى'],
+  },
+  support: {
+    '📢 معلومات': ['القوانين', 'الإعلانات', 'الأسئلة-الشائعة'],
+    '🎫 الدعم': ['فتح-تكت', 'ملاحظات'],
+    '💬 المجتمع': ['عام'],
+  },
+};
+
+app.post('/guild/:id/organize', need, access, async (req, res) => {
+  const guild = client.guilds.cache.get(req.params.id);
+  const preset = PRESETS[req.body.preset];
+  let m = 'قالب غير معروف.';
+  if (guild && preset) {
+    try {
+      for (const [cat, chans] of Object.entries(preset)) {
+        const parent = await guild.channels.create({ name: cat, type: ChannelType.GuildCategory });
+        for (const name of chans) {
+          const voice = name.startsWith('🔊') || name.startsWith('🎮') || name.startsWith('🎵');
+          await guild.channels.create({
+            name, parent: parent.id,
+            type: voice ? ChannelType.GuildVoice : ChannelType.GuildText,
+          });
+        }
+      }
+      m = 'تم إنشاء القنوات ✅';
+    } catch { m = 'فشل. تأكد إن البوت عنده صلاحية Manage Channels.'; }
+  }
+  res.redirect(`/guild/${req.params.id}?msg=` + encodeURIComponent(m));
+});
+
+app.listen(PORT, () => console.log('Dashboard on port ' + PORT));نتمنى لك وقتاً ممتعاً معنا. شارك أصدقائك واحصل على نقاط إضافية! ⭐</textarea>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">رابط صورة الترحيب:</label>
@@ -228,3 +366,21 @@
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">رسالة عند الحصول على نقاط:</label>
                     <input type="text" id="points-message" class="input-field" value="✅ أح
+{
+  "name": "discord-dashboard",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": { "start": "node index.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "discord.js": "^14.16.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0"
+  }
+}
+                    BOT_TOKEN=MTU2Nzg5OTQzNTA1MDk5NTcxMg.GboG2w.4qd7T-fRlGs4Fuh7E51n_lzj2NHAkWPP3l4aqE
+CLIENT_ID=...
+CLIENT_SECRET=...
+BASE_URL=https://JOKERBOT.onrender.com
+SESSION_SECRET=بوت =ترحيب +حمياء+نضم.تكت+👋 ترحيب
